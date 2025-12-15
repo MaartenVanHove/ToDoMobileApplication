@@ -1,18 +1,15 @@
-class TodoList {
+class Collection {
   final int id;
-  final int collectionId;
   final String name;
 
-  TodoList({
+  Collection({
     required this.id,
-    required this.collectionId,
     required this.name,
   });
 
-  factory TodoList.fromMap(Map<String, dynamic> map) {
-    return TodoList(
+  factory Collection.fromMap(Map<String, dynamic> map) {
+    return Collection(
       id: map['id'],
-      collectionId: map['collection_id'],
       name: map['name'],
     );
   }
@@ -20,7 +17,6 @@ class TodoList {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'collection_id': collectionId,
       'name': name,
     };
   }

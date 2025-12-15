@@ -1,83 +1,117 @@
 // lib/providers/app_state.dart
+import 'package:first_project/models/collection.dart';
 import 'package:first_project/models/task.dart';
 import 'package:first_project/models/todo_list.dart';
 import 'package:first_project/services/db/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class MyAppState extends ChangeNotifier {
-  List<TodoList> todoLists = [];
+  // All collections
+  List<Collection> collections = [];
+
+  // Map<collectionId, List<TodoList>>
+  Map<int, List<TodoList>> todoLists = {};
+
+  // Map<listId, List<Task>>
   Map<int, List<Task>> tasks = {};
 
   final db = DatabaseServices.instance;
 
   MyAppState() {
-    loadLists();
+    loadCollections();
   }
 
-  Future<void> loadLists() async {
-    final listMaps = await db.getAllTodoLists();
-    todoLists = listMaps.map((e) => TodoList.fromMap(e)).toList();
+  // Load all collections from DB
+  Future<void> loadCollections() async {
+    final collectionMaps = await db.getAllCollections();
+    collections = collectionMaps.map((e) => Collection.fromMap(e)).toList();
 
-    // Load tasks for each list
-    for (var list in todoLists) {
+    // Load lists for each collection
+    for (var collection in collections) {
+      await loadLists(collection.id);
+    }
+
+    notifyListeners();
+  }
+
+  // Load all lists for a given collection
+  Future<void> loadLists(int collectionId) async {
+    final listMaps = await db.getAllTodoLists(collectionId);
+    todoLists[collectionId] =
+        listMaps.map((e) => TodoList.fromMap(e)).toList();
+
+    // Load tasks for each list in this collection
+    for (var list in todoLists[collectionId]!) {
       await loadTasks(list.id);
     }
 
     notifyListeners();
   }
 
+  // Load tasks for a given list
   Future<void> loadTasks(int listId) async {
     final taskMaps = await db.getTasks(listId);
     tasks[listId] = taskMaps.map((e) => Task.fromMap(e)).toList();
     notifyListeners();
   }
 
-  // Create list and return its new id (useful for immediate next-screen creation)
-  Future<int> createList(String name) async {
-    final id = await db.addTodoList(name);
-    todoLists.add(TodoList(id: id, name: name));
+  // CREATE COLLECTION
+  Future<int> createCollection(String name) async {
+    final id = await db.addCollection(name);
+    collections.add(Collection(id: id, name: name));
+    notifyListeners();
+    return id;
+  }
+
+  // DELETE COLLECTION
+  Future<void> deleteCollection(int collectionId) async {
+    await db.deleteCollection(collectionId);
+    collections.removeWhere((c) => c.id == collectionId);
+    todoLists.remove(collectionId);
+    notifyListeners();
+  }
+
+  // CREATE LIST inside a collection
+  Future<int> createList(String name, int collectionId) async {
+    final id = await db.addTodoList(name, collectionId);
+    final newList = TodoList(id: id, name: name, collectionId: collectionId);
+    todoLists.putIfAbsent(collectionId, () => []);
+    todoLists[collectionId]!.add(newList);
     tasks[id] = [];
     notifyListeners();
     return id;
   }
 
-  // Backwards-compatible addList (keeps returning void)
-  Future<void> addList(String name) async {
-    await createList(name);
-  }
-
-  Future<void> deleteList(int listId) async {
+  // DELETE LIST
+  Future<void> deleteList(int collectionId, int listId) async {
     await db.deleteTodoList(listId);
-    todoLists.removeWhere((list) => list.id == listId);
+    todoLists[collectionId]?.removeWhere((list) => list.id == listId);
     tasks.remove(listId);
     notifyListeners();
   }
 
-  // TASK OPERATIONS
-  Future<void> addTask(int listId, String name) async {
+  // CREATE TASK
+  Future<int> addTask(int listId, String name) async {
     final taskId = await db.addTask(listId, name);
-    tasks[listId]!.add(Task(
-      id: taskId,
-      listId: listId,
-      name: name,
-      isFinished: false,
-    ));
+    final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false);
+    tasks.putIfAbsent(listId, () => []);
+    tasks[listId]!.add(newTask);
     notifyListeners();
+    return taskId;
   }
 
-  Future<void> deleteTask(int listId, int taskId) async {
-    // If you want a deleteTask db method, add it to DatabaseServices. For now, we can mark it finished or leave it.
-    final list = tasks[listId]!;
-    list.removeWhere((t) => t.id == taskId);
-    notifyListeners();
-  }
+  // // DELETE TASK
+  // Future<void> deleteTask(int listId, int taskId) async {
+  //   await db.deleteTask(taskId); // Make sure you add this method in DB
+  //   tasks[listId]?.removeWhere((t) => t.id == taskId);
+  //   notifyListeners();
+  // }
 
+  // TOGGLE TASK FINISHED
   Future<void> toggleTaskFinished(Task task) async {
     await db.updateTaskFinished(task.id, !task.isFinished);
-
     final list = tasks[task.listId]!;
     final index = list.indexWhere((t) => t.id == task.id);
-
     if (index != -1) {
       list[index] = Task(
         id: task.id,

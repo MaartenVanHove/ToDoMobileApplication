@@ -26,9 +26,18 @@ class DatabaseServices {
 
   Future<void> _createTables(Database db, int version) async {
     await db.execute('''
+    CREATE TABLE collection (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    )
+    ''');
+
+    await db.execute('''
       CREATE TABLE todo_lists (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        collection_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE
       )
     ''');
 
@@ -44,10 +53,22 @@ class DatabaseServices {
   }
 
   // CRUD FUNCTIONS
-  Future<int> addTodoList(String name) async {
+  Future<int> addCollection(String name) async {
     final db = await database;
-    return await db.insert('todo_lists', {'name': name});
+    return await db.insert('collection', {'name': name});
   }
+
+  Future<int> addTodoList(String name, int collectionId) async {
+    final db = await database;
+    return await db.insert(
+      'todo_lists',
+      {
+        'collection_id': collectionId,
+        'name': name,
+      },
+    );
+  }
+
 
   Future<int> addTask(int listId, String name) async {
     final db = await database;
@@ -58,9 +79,18 @@ class DatabaseServices {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getAllTodoLists() async {
+  Future<List<Map<String, dynamic>>> getAllCollections() async {
     final db = await database;
-    return await db.query('todo_lists');
+    return await db.query('collection');
+  }
+
+  Future<List<Map<String, dynamic>>> getAllTodoLists(int collectionId) async {
+    final db = await database;
+    return await db.query(
+      'todo_lists',
+      where: 'collection_id = ?',
+      whereArgs: [collectionId],
+    );
   }
 
   Future<List<Map<String, dynamic>>> getTasks(int listId) async {
@@ -77,6 +107,15 @@ class DatabaseServices {
     await db.update(
       'tasks',
       {'is_finished': finished ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteCollection(int id) async {
+    final db = await database;
+    await db.delete(
+      'collection',
       where: 'id = ?',
       whereArgs: [id],
     );

@@ -1,7 +1,6 @@
 // lib/screens/add_new_list_screen.dart
 import 'package:first_project/providers/app_state.dart';
-import 'package:first_project/screens/add_new_tasks_screen.dart';
-import 'package:first_project/screens/todo_screen.dart';
+import 'package:first_project/screens/add_screens/task/add_new_tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

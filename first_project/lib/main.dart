@@ -1,4 +1,4 @@
-import 'package:first_project/screens/menu_screen.dart';
+import 'package:first_project/screens/menu/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_state.dart';
