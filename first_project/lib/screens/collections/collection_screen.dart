@@ -1,45 +1,55 @@
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/models/collection.dart';
+import 'package:first_project/widgets/todo_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:first_project/providers/app_state.dart';
 
-class CollectionScreen extends StatelessWidget {
+class CollectionsScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
+    final List<Collection> collections =
+      appState.collections;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("COLLECTIONS"),
+        title: Text('Collections'),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: appState.collections.length,
-        itemBuilder: (context, index) {
-          final collection = appState.collections[index];
-          final lists = appState.todoLists[collection.id] ?? [];
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  collection.name,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: ListView.builder(
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'collection title',
                   ),
                 ),
-              )
-            ],
-          );          
-        }
+                _buildTodoTasks(appState)
+              ],
+            );
+          },
+        )
       ),
     );
   }
 
-  // Widget _horizontalScrolling() {
-  //   return 
-  // }
-
+  Widget _buildTodoTasks(MyAppState appState) {
+    return SizedBox(
+      height: 160,
+      child: ListView.builder(
+        shrinkWrap: true,
+        // physics: ,
+        itemCount: 10,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return TodoCard(cardName: 'cardName');
+        },
+      ),
+    );
+  }
 }

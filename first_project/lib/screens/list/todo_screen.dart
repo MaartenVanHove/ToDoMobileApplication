@@ -1,23 +1,42 @@
+// lib/screens/list/todo_screen.dart
 import 'package:flutter/material.dart';
-import 'package:first_project/widgets/completed_card.dart';
-import 'package:first_project/widgets/todo_card.dart';
-import 'package:first_project/providers/app_state.dart';
 import 'package:provider/provider.dart';
 
-class TodoListScreen extends StatelessWidget {
-  final int listIndex;
+import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/models/task.dart';
+import 'package:first_project/widgets/todo_card.dart';
+import 'package:first_project/widgets/completed_card.dart';
 
-  TodoListScreen({super.key, required this.listIndex});
+class TodoListScreen extends StatefulWidget {
+  final int listId;
+  final String listName;
 
+  const TodoListScreen({
+    super.key,
+    required this.listId,
+    required this.listName,
+  });
+
+  @override
+  State<TodoListScreen> createState() => _TodoListScreenState();
+}
+
+class _TodoListScreenState extends State<TodoListScreen> {
   final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure tasks are loaded once
+    Future.microtask(() {
+      context.read<MyAppState>().loadTasks(widget.listId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
-    final list = appState.todoLists[listIndex];
-    final listId = list.id;
-
-    final allTasks = appState.tasks[listId] ?? [];
+    final allTasks = appState.tasks[widget.listId] ?? [];
 
     final todoTasks = allTasks.where((t) => !t.isFinished).toList();
     final finishedTasks = allTasks.where((t) => t.isFinished).toList();
@@ -25,62 +44,55 @@ class TodoListScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // TITLE
             Padding(
               padding: const EdgeInsets.all(20),
               child: Text(
-                list.name,
+                widget.listName,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
 
-            // SCROLL VIEW
+            // SCROLLABLE CONTENT
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     if (todoTasks.isEmpty && finishedTasks.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(20),
+                      const Padding(
+                        padding: EdgeInsets.all(20),
                         child: Text(
                           "No tasks yet! 🎉",
                           style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
                       ),
 
-                    // ACTIVE TASKS
-                    _buildTodoList(context, appState, listId, todoTasks),
-
-                    SizedBox(height: 12),
-
-                    // FINISHED TASKS
-                    _buildFinishedList(context, appState, listId, finishedTasks),
+                    _buildTodoTasks(appState, todoTasks),
+                    const SizedBox(height: 12),
+                    _buildFinishedTasks(appState, finishedTasks),
                   ],
                 ),
               ),
             ),
 
             // ADD TASK UI
-            _buildTextField(),
-            _buildAddButton(appState, listId),
+            _buildInputField(),
+            _buildAddButton(appState),
           ],
         ),
       ),
     );
   }
 
-  // ------------------------
-  //     ADD TASK UI
-  // ------------------------
+  // ---------------- ADD TASK ----------------
 
-  Padding _buildTextField() {
+  Padding _buildInputField() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: TextField(
         controller: controller,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: OutlineInputBorder(),
           hintText: 'Enter new task',
         ),
@@ -88,7 +100,7 @@ class TodoListScreen extends StatelessWidget {
     );
   }
 
-  Padding _buildAddButton(MyAppState appState, int listId) {
+  Padding _buildAddButton(MyAppState appState) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       child: SizedBox(
@@ -97,17 +109,16 @@ class TodoListScreen extends StatelessWidget {
           onPressed: () {
             final name = controller.text.trim();
             if (name.isNotEmpty) {
-              appState.addTask(listId, name);
+              appState.addTask(widget.listId, name);
               controller.clear();
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 98, 144, 235),
+            backgroundColor: const Color(0xFF6290EB),
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            elevation: 2,
           ),
           child: const Text(
             "Add",
@@ -122,14 +133,12 @@ class TodoListScreen extends StatelessWidget {
     );
   }
 
-  // ------------------------
-  //     ACTIVE TASKS
-  // ------------------------
+  // ---------------- TODO TASKS ----------------
 
-  Widget _buildTodoList(BuildContext context, MyAppState appState, int listId, List tasks) {
+  Widget _buildTodoTasks(MyAppState appState, List<Task> tasks) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
@@ -139,13 +148,11 @@ class TodoListScreen extends StatelessWidget {
           direction: DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
-            padding: EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: 20),
             color: Colors.red,
-            child: Icon(Icons.delete, color: Colors.white),
+            child: const Icon(Icons.check, color: Colors.white),
           ),
-          onDismissed: (_) {
-            appState.toggleTaskFinished(task); // Move to finished
-          },
+          onDismissed: (_) => appState.toggleTaskFinished(task),
           child: TodoCard(
             cardName: task.name,
             onTap: () => appState.toggleTaskFinished(task),
@@ -155,14 +162,12 @@ class TodoListScreen extends StatelessWidget {
     );
   }
 
-  // ------------------------
-  //     FINISHED TASKS
-  // ------------------------
+  // ---------------- FINISHED TASKS ----------------
 
-  Widget _buildFinishedList(BuildContext context, MyAppState appState, int listId, List tasks) {
+  Widget _buildFinishedTasks(MyAppState appState, List<Task> tasks) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
@@ -172,13 +177,11 @@ class TodoListScreen extends StatelessWidget {
           direction: DismissDirection.startToEnd,
           background: Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(left: 20),
+            padding: const EdgeInsets.only(left: 20),
             color: Colors.green,
-            child: Icon(Icons.undo, color: Colors.white),
+            child: const Icon(Icons.undo, color: Colors.white),
           ),
-          onDismissed: (_) {
-            appState.toggleTaskFinished(task); // Move back to todo
-          },
+          onDismissed: (_) => appState.toggleTaskFinished(task),
           child: FinishedCard(
             cardName: task.name,
             onTap: () => appState.toggleTaskFinished(task),
@@ -186,5 +189,11 @@ class TodoListScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

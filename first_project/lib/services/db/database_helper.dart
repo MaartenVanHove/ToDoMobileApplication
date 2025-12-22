@@ -19,8 +19,9 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createTables,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -50,6 +51,22 @@ class DatabaseServices {
         FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE collection (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL
+        )
+      ''');
+
+      await db.execute('''
+        ALTER TABLE todo_lists
+        ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0
+      ''');
+    }
   }
 
   // CRUD FUNCTIONS

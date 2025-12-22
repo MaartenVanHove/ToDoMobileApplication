@@ -1,10 +1,13 @@
-import 'package:first_project/screens/menu/menu_screen.dart';
+import 'package:first_project/screens/collections/collection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'providers/app_state.dart';
+import 'screens/menu/menu_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -12,16 +15,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // DatabaseServices _databaseService = DatabaseServices.instance;
-
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+      create: (_) => MyAppState(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Todo List',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 0, 0)),
+          scaffoldBackgroundColor: const Color(0xFF0A0F1F), // light Spotify-like
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3A7AFE),
+          ),
+          useMaterial3: true,
         ),
-        home: MenuScreen(),
+
+        // 👇 TEMPORARY: fake collectionId
+        // home: MenuScreen(collectionId: 1, collectionName: 'Notes',),
+        home: CollectionsScreen()
       ),
     );
   }
