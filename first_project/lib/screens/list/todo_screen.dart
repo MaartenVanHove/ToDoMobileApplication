@@ -50,7 +50,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
               padding: const EdgeInsets.all(20),
               child: Text(
                 widget.listName,
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: TextStyle(
+                  fontSize: 32,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
 
@@ -87,20 +91,26 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   // ---------------- ADD TASK ----------------
 
-  Padding _buildInputField() {
+  Widget _buildInputField() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: controller,
+        style: TextStyle(
+          color: Colors.white,
+        ),
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
           hintText: 'Enter new task',
+          hintStyle: TextStyle(
+            color: Color(0xFF9BB3D1),
+          )
         ),
       ),
     );
   }
 
-  Padding _buildAddButton(MyAppState appState) {
+  Widget _buildAddButton(MyAppState appState) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       child: SizedBox(
@@ -149,7 +159,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            color: Colors.red,
+            color: const Color.fromARGB(255, 60, 244, 54),
             child: const Icon(Icons.check, color: Colors.white),
           ),
           onDismissed: (_) => appState.toggleTaskFinished(task),
@@ -178,7 +188,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
           background: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 20),
-            color: Colors.green,
+            color: const Color.fromARGB(255, 76, 78, 175),
             child: const Icon(Icons.undo, color: Colors.white),
           ),
           onDismissed: (_) => appState.toggleTaskFinished(task),

@@ -15,17 +15,20 @@ class FinishedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Card(
-        color: Colors.grey.shade200,
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            cardName,
-            style: TextStyle(
-              fontSize: 18,
-              decoration: TextDecoration.lineThrough,
-              color: Colors.grey.shade700,
+      child: SizedBox(
+        width: double.infinity,
+        child: Card(
+          color: const Color(0xFF162238),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Text(
+              cardName,
+              style: TextStyle(
+                fontSize: 18,
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey.shade700,
+              ),
             ),
           ),
         ),

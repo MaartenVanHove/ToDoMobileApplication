@@ -1,23 +1,16 @@
 // lib/screens/add_screens/list/add_new_list_screen.dart
 import 'package:first_project/providers/app_state.dart';
-import 'package:first_project/screens/list/todo_screen.dart';
+import 'package:first_project/screens/collections/collection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AddNewListScreen extends StatelessWidget {
-  final int collectionId;
-
-  AddNewListScreen({
-    super.key,
-    required this.collectionId,
-  });
+class AddNewCollectionScreen extends StatelessWidget {
 
   final TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
-    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -44,7 +37,7 @@ class AddNewListScreen extends StatelessWidget {
 
   Widget _buildTitle() {
     return Text(
-      "Add New List",
+      "Add New Collection",
       style: TextStyle(
         color: Colors.white,
         fontWeight: FontWeight.w600,
@@ -73,7 +66,7 @@ class AddNewListScreen extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => _saveNewList(context, appState),
+        onPressed: () => _saveNewCollection(context, appState),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF3A7AFE),
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -95,7 +88,7 @@ class AddNewListScreen extends StatelessWidget {
 
   // ---------------- Logic ----------------
 
-  Future<void> _saveNewList(
+  Future<void> _saveNewCollection(
     BuildContext context,
     MyAppState appState,
   ) async {
@@ -103,22 +96,19 @@ class AddNewListScreen extends StatelessWidget {
 
     if (input.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a list name")),
+        const SnackBar(content: Text("Please enter a collection name")),
       );
       return;
     }
 
     // ✅ Create list inside correct collection
-    final newListId = await appState.createList(input, collectionId);
+    await appState.createCollection(input);
 
     // Navigate to add tasks
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TodoListScreen(
-          listId: newListId,
-          listName: input,
-        ),
+        builder: (_) => CollectionsScreen(),
       ),
     );
   }

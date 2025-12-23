@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 
-class TodoCard extends StatelessWidget {
-  final String cardName;
+class ListCard extends StatelessWidget {
+  final String listName;
   final VoidCallback? onTap;
+  // final VoiCallback? onPressed;
 
-  const TodoCard({
+  const ListCard({
     super.key,
-    required this.cardName,
-    this.onTap,
+    required this.listName,
+    required this.onTap,
+    // required this.onPressed,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: SizedBox(
-        width: double.infinity,
+        width: 200,
         child: Card(
           color: const Color(0xFF1E2F4D),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(20),
             child: Text(
-              cardName,
+              listName,
               style: const TextStyle(
                 fontSize: 18,
-                color: Colors.white,
+                color: Color(0xFF9BB3D1)
               ),
             ),
           ),

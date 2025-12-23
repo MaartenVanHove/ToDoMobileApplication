@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/app_state.dart';
-import 'screens/menu/menu_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +27,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
 
-        // 👇 TEMPORARY: fake collectionId
-        // home: MenuScreen(collectionId: 1, collectionName: 'Notes',),
-        home: CollectionsScreen()
+        // home: MenuScreen(collectionId: 1, collectionName: 'collectionName')
+        home: CollectionsScreen(),
       ),
     );
   }
