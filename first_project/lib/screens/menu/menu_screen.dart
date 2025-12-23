@@ -87,7 +87,7 @@ class MenuScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TodoListScreen(
+                builder: (_) => ListScreen(
                   listId: list.id,
                   listName: list.name,
                 ),

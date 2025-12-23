@@ -3,6 +3,7 @@ import 'package:first_project/screens/add_screens/collection/add_new_collection.
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/todo_screen.dart';
 import 'package:first_project/widgets/list_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
@@ -11,6 +12,7 @@ class CollectionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("LOLLOLOLOL");
     final appState = context.watch<MyAppState>();
     final List<Collection> collections =
       appState.collections;
@@ -32,7 +34,6 @@ class CollectionsScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Collection name
                       Text(
                         collection.name,
                         style: const TextStyle(
@@ -41,17 +42,38 @@ class CollectionsScreen extends StatelessWidget {
                           fontSize: 26,
                         ),
                       ),
+                      
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _navigateToAddListScreen(context, collection.id);
+                            },
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
 
-                      // Add button
-                      IconButton(
-                        onPressed: () {
-                          _navigateToAddListScreen(context, collection.id);
-                        },
-                        icon: const Icon(
-                          Icons.add_circle_outline,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                          IconButton(
+                            onPressed: () {
+                              _showConfirmDialog(
+                                context: context,
+                                title: "Delete Collection?",
+                                message: "This will delete all lists and tasks inside it.",
+                                onConfirm: () {
+                                  appState.deleteCollection(collection.id);
+                                },
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.delete_forever,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                        ]
                       ),
                     ],
                   ),
@@ -65,7 +87,7 @@ class CollectionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodoLists(MyAppState appState, var collectionId) {
+  Widget _buildTodoLists(MyAppState appState, int collectionId) {
     final todoListsInCollection = appState.todoLists[collectionId] ?? [];
 
     if (todoListsInCollection.isEmpty) {
@@ -81,21 +103,32 @@ class CollectionsScreen extends StatelessWidget {
     return SizedBox(
       height: 140,
       child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: todoListsInCollection.length,
         scrollDirection: Axis.horizontal,
+        itemCount: todoListsInCollection.length,
         itemBuilder: (context, index) {
-          final todoListsInCollection = appState.todoLists[collectionId] ?? [];
           final todoList = todoListsInCollection[index];
 
           return ListCard(
             listName: todoList.name,
-            onTap: () => _navigateToListScreen(context, index, todoList.name),
+            onTap: () => _navigateToListScreen(
+              context, 
+              todoList.id,         // pass the actual list ID here
+              todoList.name,
+            ),
+            onPressed: () => _showConfirmDialog(
+              context: context,
+              title: "Delete List?",
+              message: "Are you sure you want to delete this list?",
+              onConfirm: () {
+                appState.deleteList(collectionId, todoList.id);
+              },
+            )
           );
         },
       ),
     );
   }
+
 
   AppBar _buildTitle() {
     return AppBar(
@@ -140,8 +173,47 @@ class CollectionsScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TodoListScreen(listId: listId, listName: listName,),
+        builder: (_) => ListScreen(listId: listId, listName: listName,),
       )
     );
+  }
+
+  void _showConfirmDialog({
+    required BuildContext context,
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+  }) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text("No"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                onConfirm();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteList() {
+
+  }
+
+  void deleteCollection() {
+    
   }
 }

@@ -7,21 +7,21 @@ import 'package:first_project/models/task.dart';
 import 'package:first_project/widgets/todo_card.dart';
 import 'package:first_project/widgets/completed_card.dart';
 
-class TodoListScreen extends StatefulWidget {
+class ListScreen extends StatefulWidget {
   final int listId;
   final String listName;
 
-  const TodoListScreen({
+  const ListScreen({
     super.key,
     required this.listId,
     required this.listName,
   });
 
   @override
-  State<TodoListScreen> createState() => _TodoListScreenState();
+  State<ListScreen> createState() => _ListScreenState();
 }
 
-class _TodoListScreenState extends State<TodoListScreen> {
+class _ListScreenState extends State<ListScreen> {
   final TextEditingController controller = TextEditingController();
 
   @override
@@ -40,6 +40,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
     final todoTasks = allTasks.where((t) => !t.isFinished).toList();
     final finishedTasks = allTasks.where((t) => t.isFinished).toList();
+
 
     return Scaffold(
       body: SafeArea(

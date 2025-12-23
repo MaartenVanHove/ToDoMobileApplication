@@ -115,7 +115,7 @@ class AddNewListScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TodoListScreen(
+        builder: (_) => ListScreen(
           listId: newListId,
           listName: input,
         ),
