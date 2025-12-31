@@ -19,16 +19,21 @@ class ListCard extends StatelessWidget {
       onLongPress: onPressed,
       child: SizedBox(
         width: 200,
+        height: 120, // IMPORTANT: give it height so "bottom" makes sense
         child: Card(
           color: const Color(0xFF1E2F4D),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Text(
-              listName,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Color(0xFF9BB3D1)
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                listName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFF9BB3D1),
+                ),
               ),
             ),
           ),
@@ -36,4 +41,5 @@ class ListCard extends StatelessWidget {
       ),
     );
   }
+
 }

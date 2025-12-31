@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/models/task.dart';
-import 'package:first_project/widgets/todo_card.dart';
-import 'package:first_project/widgets/completed_card.dart';
+import 'package:first_project/widgets/cards/todo_card.dart';
+import 'package:first_project/widgets/cards/completed_card.dart';
 
 class ListScreen extends StatefulWidget {
   final int listId;

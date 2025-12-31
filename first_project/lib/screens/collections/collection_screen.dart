@@ -2,7 +2,8 @@ import 'package:first_project/models/collection.dart';
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/todo_screen.dart';
-import 'package:first_project/widgets/list_card.dart';
+import 'package:first_project/widgets/cards/list_card.dart';
+import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,13 +59,16 @@ class CollectionsScreen extends StatelessWidget {
 
                           IconButton(
                             onPressed: () {
-                              _showConfirmDialog(
+                              showDialog(
                                 context: context,
-                                title: "Delete Collection?",
-                                message: "This will delete all lists and tasks inside it.",
-                                onConfirm: () {
-                                  appState.deleteCollection(collection.id);
-                                },
+                                barrierDismissible: false,
+                                builder: (_) => ConfirmDialog(
+                                  title: "Delete ${collection.name}?",
+                                  message: "This will permanently remove the collection and all its lists.",
+                                  onConfirm: () {
+                                    appState.deleteCollection(collection.id);
+                                  },
+                                ),
                               );
                             },
                             icon: const Icon(
@@ -78,7 +82,7 @@ class CollectionsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                _buildTodoLists(appState, collection.id),
+                _buildListView(appState, collection.id),
               ],
             );
           },
@@ -87,7 +91,7 @@ class CollectionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodoLists(MyAppState appState, int collectionId) {
+  Widget _buildListView(MyAppState appState, int collectionId) {
     final todoListsInCollection = appState.todoLists[collectionId] ?? [];
 
     if (todoListsInCollection.isEmpty) {
@@ -115,13 +119,16 @@ class CollectionsScreen extends StatelessWidget {
               todoList.id,         // pass the actual list ID here
               todoList.name,
             ),
-            onPressed: () => _showConfirmDialog(
+            onPressed: () => showDialog(
               context: context,
-              title: "Delete List?",
-              message: "Are you sure you want to delete this list?",
-              onConfirm: () {
-                appState.deleteList(collectionId, todoList.id);
-              },
+              barrierDismissible: false,
+              builder: (_) => ConfirmDialog(
+                title: "Delete ${todoList.name}?",
+                message: "This will permanently remove the list.",
+                onConfirm: () {
+                  appState.deleteCollection(collectionId);
+                },
+              ),
             )
           );
         },
@@ -171,7 +178,7 @@ class CollectionsScreen extends StatelessWidget {
 
   void _navigateToListScreen(BuildContext context, var listId, var listName) {
     Navigator.push(
-      context,
+      context,  
       MaterialPageRoute(
         builder: (_) => ListScreen(listId: listId, listName: listName,),
       )

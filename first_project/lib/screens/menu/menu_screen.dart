@@ -5,7 +5,7 @@ import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/models/todo_list.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/todo_screen.dart';
-import 'package:first_project/widgets/todolist_card.dart';
+import 'package:first_project/widgets/cards/todolist_card.dart';
 
 class MenuScreen extends StatelessWidget {
   final int collectionId;
