@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 
 class FinishedCard extends StatelessWidget {
   final String cardName;
-  final VoidCallback? onTap;
+  final VoidCallback onPressed;
 
   const FinishedCard({
     super.key,
     required this.cardName,
-    this.onTap,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onLongPress: onPressed,
       child: SizedBox(
         width: double.infinity,
         child: Card(

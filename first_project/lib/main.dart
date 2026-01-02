@@ -20,14 +20,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Todo List',
         theme: ThemeData(
-          scaffoldBackgroundColor: const Color(0xFF0A0F1F), // light Spotify-like
+          scaffoldBackgroundColor: const Color(0xFF0A0F1F), 
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF3A7AFE),
           ),
           useMaterial3: true,
         ),
 
-        // home: MenuScreen(collectionId: 1, collectionName: 'collectionName')
         home: CollectionsScreen(),
       ),
     );

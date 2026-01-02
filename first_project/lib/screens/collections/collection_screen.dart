@@ -126,7 +126,7 @@ class CollectionsScreen extends StatelessWidget {
                 title: "Delete ${todoList.name}?",
                 message: "This will permanently remove the list.",
                 onConfirm: () {
-                  appState.deleteCollection(collectionId);
+                  appState.deleteList(collectionId, todoList.id);
                 },
               ),
             )

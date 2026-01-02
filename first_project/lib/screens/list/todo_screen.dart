@@ -1,4 +1,5 @@
 // lib/screens/list/todo_screen.dart
+import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -166,12 +167,25 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: TodoCard(
             cardName: task.name,
-            onTap: () => appState.toggleTaskFinished(task),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => ConfirmDialog(
+                  title: "Delete ${task.name}",
+                  message:
+                      "This action will permanently delete the selected task.",
+                  onConfirm: () {
+                    appState.deleteTask(task.listId, task.id);
+                  },
+                ),
+              );
+            },
           ),
         );
       },
     );
   }
+
 
   // ---------------- FINISHED TASKS ----------------
 
@@ -195,7 +209,17 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: FinishedCard(
             cardName: task.name,
-            onTap: () => appState.toggleTaskFinished(task),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => ConfirmDialog(
+                title: "Delete ${task.name}",
+                message:
+                    "This action will permanently delete the selected task.",
+                onConfirm: () {
+                  appState.deleteTask(task.listId, task.id);
+                },
+              ),
+            ),
           ),
         );
       },

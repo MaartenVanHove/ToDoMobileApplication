@@ -100,12 +100,12 @@ class MyAppState extends ChangeNotifier {
     return taskId;
   }
 
-  // // DELETE TASK
-  // Future<void> deleteTask(int listId, int taskId) async {
-  //   await db.deleteTask(taskId); // Make sure you add this method in DB
-  //   tasks[listId]?.removeWhere((t) => t.id == taskId);
-  //   notifyListeners();
-  // }
+  // DELETE TASK
+  Future<void> deleteTask(int listId, int taskId) async {
+    await db.deleteTask(taskId); // Make sure you add this method in DB
+    tasks[listId]?.removeWhere((t) => t.id == taskId);
+    notifyListeners();
+  }
 
   // TOGGLE TASK FINISHED
   Future<void> toggleTaskFinished(Task task) async {
