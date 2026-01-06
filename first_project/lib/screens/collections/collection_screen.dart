@@ -73,7 +73,7 @@ class CollectionsScreen extends StatelessWidget {
                             },
                             icon: const Icon(
                               Icons.delete_forever,
-                              color: Colors.white,
+                              color: const Color(0xFF9BB3D1),
                               size: 28,
                             ),
                           ),
@@ -183,44 +183,5 @@ class CollectionsScreen extends StatelessWidget {
         builder: (_) => ListScreen(listId: listId, listName: listName,),
       )
     );
-  }
-
-  void _showConfirmDialog({
-    required BuildContext context,
-    required String title,
-    required String message,
-    required VoidCallback onConfirm,
-  }) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            CupertinoDialogAction(
-              child: const Text("No"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            CupertinoDialogAction(
-              isDestructiveAction: true,
-              child: const Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                onConfirm();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void deleteList() {
-
-  }
-
-  void deleteCollection() {
-    
   }
 }
