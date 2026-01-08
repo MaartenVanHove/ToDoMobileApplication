@@ -42,24 +42,24 @@ class _ListScreenState extends State<ListScreen> {
     final todoTasks = allTasks.where((t) => !t.isFinished).toList();
     final finishedTasks = allTasks.where((t) => t.isFinished).toList();
 
+    AppBar _buildTitle(String title) {
+      return AppBar(
+          backgroundColor: const Color(0xFF0A0F1F),
+          title: Text(title),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 32
+          ),
+          centerTitle: true
+        );
+    }
 
     return Scaffold(
+      appBar: _buildTitle(widget.listName),
       body: SafeArea(
         child: Column(
           children: [
-            // TITLE
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text(
-                widget.listName,
-                style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
             // SCROLLABLE CONTENT
             Expanded(
               child: SingleChildScrollView(
@@ -69,7 +69,7 @@ class _ListScreenState extends State<ListScreen> {
                       const Padding(
                         padding: EdgeInsets.all(20),
                         child: Text(
-                          "No tasks yet! 🎉",
+                          "No cards yet! 🎉",
                           style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
                       ),

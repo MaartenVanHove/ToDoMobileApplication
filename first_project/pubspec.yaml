@@ -1,7 +1,7 @@
 name: first_project
 description: "List Creator Application"
 publish_to: "none"
-version: 0.5.0
+version: 0.8.0
 
 environment:
   sdk: ^3.9.0
@@ -19,7 +19,7 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
 flutter_icons:
-  image_path: "assets/icon/finalappicon.png"
+  image_path: "assets/icon/Icon.png"
   android: true
   ios: true
 
