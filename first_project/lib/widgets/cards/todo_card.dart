@@ -19,15 +19,31 @@ class TodoCard extends StatelessWidget {
         child: Card(
           color: const Color(0xFF1E2F4D),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Text(
-              cardName,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Text(
+                  cardName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
+              IconButton(
+                onPressed: () {},
+                onLongPress: () {
+                  //TODO: change position
+                },
+                icon: const Icon(
+                  Icons.drag_handle,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),              
+            ],
           ),
         ),
       ),

@@ -20,7 +20,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Todo List',
         theme: ThemeData(
-          scaffoldBackgroundColor: const Color(0xFF0A0F1F), 
+          scaffoldBackgroundColor: const Color(0xFF0A0F1F),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF0A0F1F),
+            iconTheme: IconThemeData(color: Colors.white), // Dit kleurt de back-arrow wit
+            actionsIconTheme: IconThemeData(color: Colors.white),
+          ),
+          iconTheme: IconThemeData(color: Colors.white), 
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF3A7AFE),
           ),

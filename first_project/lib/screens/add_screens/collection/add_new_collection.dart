@@ -13,6 +13,7 @@ class AddNewCollectionScreen extends StatelessWidget {
     final appState = context.watch<MyAppState>();
 
     return Scaffold(
+      appBar: _buildTitle(),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -20,8 +21,6 @@ class AddNewCollectionScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildTitle(),
-                const SizedBox(height: 32),
                 _buildInputField(),
                 const SizedBox(height: 16),
                 _buildNextButton(context, appState),
@@ -35,15 +34,17 @@ class AddNewCollectionScreen extends StatelessWidget {
 
   // ---------------- UI ----------------
 
-  Widget _buildTitle() {
-    return Text(
-      "Add New Collection",
-      style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.w600,
-        fontSize: 18,
-      )
-    );
+  AppBar _buildTitle() {
+    return AppBar(
+        backgroundColor: const Color(0xFF0A0F1F),
+        title: Text('Add Collection'),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 32
+        ),
+        centerTitle: true
+      );
   }
 
   Widget _buildInputField() {

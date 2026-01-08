@@ -90,6 +90,7 @@ class CollectionsScreen extends StatelessWidget {
       ),
     );
   }
+  
 
   Widget _buildListView(MyAppState appState, int collectionId) {
     final todoListsInCollection = appState.todoLists[collectionId] ?? [];

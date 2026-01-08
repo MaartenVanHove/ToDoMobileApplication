@@ -76,7 +76,7 @@ class MyAppState extends ChangeNotifier {
     final id = await db.addTodoList(name, collectionId);
     final newList = TodoList(id: id, name: name, collectionId: collectionId);
     todoLists.putIfAbsent(collectionId, () => []);
-    todoLists[collectionId]!.add(newList);
+    todoLists[collectionId]!.insert(0, newList);
     tasks[id] = [];
     notifyListeners();
     return id;
@@ -95,7 +95,7 @@ class MyAppState extends ChangeNotifier {
     final taskId = await db.addTask(listId, name);
     final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false);
     tasks.putIfAbsent(listId, () => []);
-    tasks[listId]!.add(newTask);
+    tasks[listId]!.insert(0, newTask);
     notifyListeners();
     return taskId;
   }

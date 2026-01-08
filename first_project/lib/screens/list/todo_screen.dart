@@ -121,8 +121,7 @@ class _ListScreenState extends State<ListScreen> {
           onPressed: () {
             final name = controller.text.trim();
             if (name.isNotEmpty) {
-              appState.addTask(widget.listId, name);
-              controller.clear();
+              _addNewTask(appState, name);
             }
           },
           style: ElevatedButton.styleFrom(
@@ -144,8 +143,13 @@ class _ListScreenState extends State<ListScreen> {
       ),
     );
   }
+  
+  void _addNewTask(MyAppState appState, String name) {
+    appState.addTask(widget.listId, name);
+    controller.clear();
+  }
 
-  // ---------------- TODO TASKS ----------------
+  // ---------------- TASKS ----------------
 
   Widget _buildTodoTasks(MyAppState appState, List<Task> tasks) {
     return ListView.builder(
