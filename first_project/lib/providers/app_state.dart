@@ -122,4 +122,17 @@ class MyAppState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void updateTaskOrder(int listId, List<Task> reorderedTodos) {
+    final all = tasks[listId] ?? [];
+
+    final finished = all.where((t) => t.isFinished).toList();
+
+    tasks[listId] = [
+      ...reorderedTodos,
+      ...finished,
+    ];
+
+    notifyListeners();
+  }
 }

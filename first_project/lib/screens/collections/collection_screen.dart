@@ -1,7 +1,7 @@
 import 'package:first_project/models/collection.dart';
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
-import 'package:first_project/screens/list/todo_screen.dart';
+import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/widgets/cards/list_card.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';

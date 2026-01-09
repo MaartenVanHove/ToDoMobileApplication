@@ -42,24 +42,24 @@ class _ListScreenState extends State<ListScreen> {
     final todoTasks = allTasks.where((task) => !task.isFinished).toList();
     final finishedTasks = allTasks.where((task) => task.isFinished).toList();
 
-    AppBar _buildTitle(String title) {
-      return AppBar(
-          backgroundColor: const Color(0xFF0A0F1F),
-          title: Text(title),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 32
-          ),
-          centerTitle: true
-        );
-    }
-
     return Scaffold(
       appBar: _buildTitle(widget.listName),
       body: SafeArea(
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white70, size: 24),
+                  onPressed: () {
+                    // Logic to edit the title
+                    print("Edit list");
+                  },
+                ),
+              ],
+            ),
             // SCROLLABLE CONTENT
             Expanded(
               child: SingleChildScrollView(
@@ -88,6 +88,39 @@ class _ListScreenState extends State<ListScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  AppBar _buildTitle(String title) {
+    return AppBar(
+      backgroundColor: const Color(0xFF0A0F1F),
+      // 1. Keep the title simple so it centers perfectly
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 32,
+        ),
+      ),
+      centerTitle: true,
+      
+      // 2. Use 'actions' to push the icon to the far right
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.menu, color: 
+            Colors.white70, 
+            size: 28
+          ),
+          onPressed: () {
+            // Logic to edit the title
+            print("Open menu");
+          },
+        ),
+        // Optional: Add a small bit of padding so the icon isn't touching the screen edge
+        const SizedBox(width: 8), 
+      ],
     );
   }
 
@@ -152,7 +185,19 @@ class _ListScreenState extends State<ListScreen> {
   // ---------------- TASKS ----------------
 
   Widget _buildTodoTasks(MyAppState appState, List<Task> tasks) {
-    return ListView.builder(
+    return ReorderableListView.builder(
+      onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if(oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+
+          final movedTask = tasks.removeAt(oldIndex);
+          tasks.insert(newIndex, movedTask);
+
+          appState.updateTaskOrder(widget.listId, tasks);
+        });
+      },
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: tasks.length,
@@ -171,6 +216,7 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: TodoCard(
             cardName: task.name,
+            index: index,
             onPressed: () {
               showDialog(
                 context: context,
@@ -189,7 +235,6 @@ class _ListScreenState extends State<ListScreen> {
       },
     );
   }
-
 
   // ---------------- FINISHED TASKS ----------------
 

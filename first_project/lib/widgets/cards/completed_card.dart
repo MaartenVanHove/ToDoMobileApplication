@@ -14,23 +14,24 @@ class FinishedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onLongPress: onPressed,
+      onLongPress: () {},
       child: SizedBox(
         width: double.infinity,
         child: Card(
           color: const Color(0xFF162238),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Text(
-              cardName,
-              style: TextStyle(
-                fontSize: 18,
-                decoration: TextDecoration.lineThrough,
-                color: Colors.grey.shade700,
+          child:
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                cardName,
+                style: TextStyle(
+                  fontSize: 18,
+                  decoration: TextDecoration.lineThrough,
+                  color: Colors.grey.shade700,
+                ),
               ),
             ),
-          ),
         ),
       ),
     );
