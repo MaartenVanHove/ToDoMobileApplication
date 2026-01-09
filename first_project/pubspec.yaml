@@ -19,9 +19,16 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
 flutter_icons:
-  image_path: "assets/icon/Icon.png"
   android: true
   ios: true
+
+  # IOS:
+  image_path: "assets/icon/Icon.png"
+  # Android:
+  adaptive_icon_background: "#0F5CC8"
+  adaptive_icon_foreground: "assets/icon/foreground/forerground.png"
+  # This will add 32% padding around your image to make it smaller  
+  adaptive_icon_foreground_inset: 32
 
 flutter:
   uses-material-design: true

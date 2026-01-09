@@ -39,8 +39,8 @@ class _ListScreenState extends State<ListScreen> {
     final appState = context.watch<MyAppState>();
     final allTasks = appState.tasks[widget.listId] ?? [];
 
-    final todoTasks = allTasks.where((t) => !t.isFinished).toList();
-    final finishedTasks = allTasks.where((t) => t.isFinished).toList();
+    final todoTasks = allTasks.where((task) => !task.isFinished).toList();
+    final finishedTasks = allTasks.where((task) => task.isFinished).toList();
 
     AppBar _buildTitle(String title) {
       return AppBar(
