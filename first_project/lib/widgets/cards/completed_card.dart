@@ -1,39 +1,40 @@
 // lib/widgets/completed_card.dart
+import 'package:first_project/widgets/cards/base_card/base_card.dart';
 import 'package:flutter/material.dart';
 
 class FinishedCard extends StatelessWidget {
   final String cardName;
-  final VoidCallback onPressed;
+  final int index;
+  final VoidCallback onTap;
+  final bool isEditMode;
+  final bool isSelected;
 
   const FinishedCard({
     super.key,
     required this.cardName,
-    required this.onPressed,
+    required this.index,
+    required this.onTap,
+    required this.isEditMode,
+    required this.isSelected,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onLongPress: () {},
-      child: SizedBox(
-        width: double.infinity,
-        child: Card(
-          color: const Color(0xFF162238),
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child:
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                cardName,
-                style: TextStyle(
-                  fontSize: 18,
-                  decoration: TextDecoration.lineThrough,
-                  color: Colors.grey.shade700,
-                ),
-              ),
-            ),
-        ),
+    return BaseTaskCard(
+      title: cardName,
+      index: index,
+      onTap: onTap,
+      isEditMode: isEditMode,
+      isSelected: isSelected,
+      showDragHandle: false,
+      backgroundColor: const Color(0xFF162238),
+      textStyle: TextStyle(
+        fontSize: 18,
+        decoration: TextDecoration.lineThrough,
+        color: Colors.grey.shade700,
       ),
     );
   }
 }
+
+

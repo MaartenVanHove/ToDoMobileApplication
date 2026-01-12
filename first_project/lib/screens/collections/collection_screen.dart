@@ -4,7 +4,6 @@ import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart'
 import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/widgets/cards/list_card.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
@@ -13,7 +12,6 @@ class CollectionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("LOLLOLOLOL");
     final appState = context.watch<MyAppState>();
     final List<Collection> collections =
       appState.collections;
@@ -46,7 +44,7 @@ class CollectionsScreen extends StatelessWidget {
                       
                       Row(
                         children: [
-                          IconButton(
+                          TextButton.icon(
                             onPressed: () {
                               _navigateToAddListScreen(context, collection.id);
                             },
@@ -54,6 +52,14 @@ class CollectionsScreen extends StatelessWidget {
                               Icons.add_circle_outline,
                               color: Colors.white,
                               size: 28,
+                            ),
+                            label: const Text(
+                              "List",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
 
@@ -152,12 +158,24 @@ class CollectionsScreen extends StatelessWidget {
   }
 
   FloatingActionButton _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       onPressed: () => _navigateToAddCollectionScreen(context),
       backgroundColor: const Color(0xFF3A7AFE),
-      child: const Icon(Icons.add, color: Colors.white, size: 32),
+      icon: const Icon(
+        Icons.add,
+        color: Colors.white,
+      ),
+      label: const Text(
+        "Collection",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
+
 
   void _navigateToAddCollectionScreen(BuildContext context) {
     Navigator.push(

@@ -1,5 +1,4 @@
 // lib/screens/list/todo_screen.dart
-import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +24,11 @@ class ListScreen extends StatefulWidget {
 class _ListScreenState extends State<ListScreen> {
   final TextEditingController controller = TextEditingController();
 
+  bool isEditMode = false;
+
+  final Set<int> selectedTaskIds = {};
+
+
   @override
   void initState() {
     super.initState();
@@ -47,19 +51,8 @@ class _ListScreenState extends State<ListScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.white70, size: 24),
-                  onPressed: () {
-                    // Logic to edit the title
-                    print("Edit list");
-                  },
-                ),
-              ],
-            ),
+            if(todoTasks.isNotEmpty || finishedTasks.isNotEmpty)
+              _buildEditIcon(),
             // SCROLLABLE CONTENT
             Expanded(
               child: SingleChildScrollView(
@@ -75,16 +68,17 @@ class _ListScreenState extends State<ListScreen> {
                       ),
 
                     _buildTodoTasks(appState, todoTasks),
-                    const SizedBox(height: 12),
                     _buildFinishedTasks(appState, finishedTasks),
                   ],
                 ),
               ),
             ),
 
-            // ADD TASK UI
-            _buildInputField(),
-            _buildAddButton(appState),
+            if(isEditMode) _buildEditActions(appState),
+            if(!isEditMode) 
+              _buildInputField(),
+            if(!isEditMode)
+              _buildAddButton(appState),
           ],
         ),
       ),
@@ -124,6 +118,44 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
+  Widget _buildEditIcon() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const SizedBox(width: 8),
+        TextButton.icon(
+          icon: Icon(
+            Icons.edit, 
+            color: isEditMode ? Colors.white : Color(0xFF9BB3D1), 
+            size: 24
+          ),
+          label: Text(
+            "EDIT",
+            style: TextStyle(
+              color: isEditMode ? Colors.white : Color(0xFF9BB3D1),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            _toggleEditMode();
+          },
+        ),
+      ],
+    );
+  }
+
+  void _toggleEditMode() {
+    setState(() {
+      isEditMode = !isEditMode;
+      if(!isEditMode) _resetEditMode();
+    });
+  }
+
+  void _resetEditMode() {
+    selectedTaskIds.clear();
+  }
+
   // ---------------- ADD TASK ----------------
 
   Widget _buildInputField() {
@@ -147,7 +179,7 @@ class _ListScreenState extends State<ListScreen> {
 
   Widget _buildAddButton(MyAppState appState) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -206,7 +238,9 @@ class _ListScreenState extends State<ListScreen> {
 
         return Dismissible(
           key: ValueKey(task.id),
-          direction: DismissDirection.endToStart,
+          direction: isEditMode
+            ? DismissDirection.none
+            : DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
@@ -217,19 +251,19 @@ class _ListScreenState extends State<ListScreen> {
           child: TodoCard(
             cardName: task.name,
             index: index,
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => ConfirmDialog(
-                  title: "Delete ${task.name}",
-                  message:
-                      "This action will permanently delete the selected task.",
-                  onConfirm: () {
-                    appState.deleteTask(task.listId, task.id);
-                  },
-                ),
-              );
+            onTap: () {
+              if(!isEditMode) return;
+
+              setState(() {
+                if (selectedTaskIds.contains(task.id)) {
+                  selectedTaskIds.remove(task.id);
+                } else {
+                  selectedTaskIds.add(task.id);
+                }
+              });
             },
+            isEditMode: isEditMode,
+            isSelected: selectedTaskIds.contains(task.id),
           ),
         );
       },
@@ -258,20 +292,65 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: FinishedCard(
             cardName: task.name,
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) => ConfirmDialog(
-                title: "Delete ${task.name}",
-                message:
-                    "This action will permanently delete the selected task.",
-                onConfirm: () {
-                  appState.deleteTask(task.listId, task.id);
-                },
-              ),
-            ),
+            index: index,
+            onTap: () {
+              if(!isEditMode) return;
+
+              setState(() {
+                if (selectedTaskIds.contains(task.id)) {
+                  selectedTaskIds.remove(task.id);
+                } else {
+                  selectedTaskIds.add(task.id);
+                }
+              });
+            },
+            isEditMode: isEditMode,
+            isSelected: selectedTaskIds.contains(task.id),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildEditActions(MyAppState appState) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      // color: const Color(0xFF0A0F1F),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+              ),
+              onPressed: selectedTaskIds.isEmpty
+                  ? null
+                  : () {
+                      for (final id in selectedTaskIds) {
+                        appState.deleteTask(widget.listId, id);
+                      }
+                      setState(() {
+                        selectedTaskIds.clear();
+                        isEditMode = false;
+                      });
+                    },
+              child: Text("Delete ${selectedTaskIds.length}"),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  selectedTaskIds.clear();
+                  isEditMode = false;
+                });
+              },
+              child: const Text("Cancel"),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
