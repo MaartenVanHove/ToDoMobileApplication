@@ -123,6 +123,7 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+  // UPDATE TASK NAME
   Future<void> updateTaskName(Task task, String name) async {
     db.updateTaskName(task.id, name);
     final list = tasks[task.listId]!;

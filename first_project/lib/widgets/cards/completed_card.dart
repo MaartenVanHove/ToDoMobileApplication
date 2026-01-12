@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 class FinishedCard extends StatelessWidget {
   final String cardName;
   final int index;
-  final VoidCallback onTap;
+  final VoidCallback onTapSelect;
+  final VoidCallback onTapUpdateName;
+  final VoidCallback onTapInstantDelete;
   final bool isEditMode;
   final bool isSelected;
 
@@ -13,7 +15,9 @@ class FinishedCard extends StatelessWidget {
     super.key,
     required this.cardName,
     required this.index,
-    required this.onTap,
+    required this.onTapSelect,
+    required this.onTapUpdateName,
+    required this.onTapInstantDelete,
     required this.isEditMode,
     required this.isSelected,
   });
@@ -23,7 +27,9 @@ class FinishedCard extends StatelessWidget {
     return BaseTaskCard(
       title: cardName,
       index: index,
-      onTap: onTap,
+      onTapSelect: onTapSelect,
+      onTapUpdateName: onTapUpdateName,
+      onTapInstantDelete: onTapInstantDelete,
       isEditMode: isEditMode,
       isSelected: isSelected,
       showDragHandle: false,

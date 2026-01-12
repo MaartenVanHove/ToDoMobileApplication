@@ -1,4 +1,5 @@
 // lib/screens/list/todo_screen.dart
+import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -251,7 +252,7 @@ class _ListScreenState extends State<ListScreen> {
           child: TodoCard(
             cardName: task.name,
             index: index,
-            onTap: () {
+            onTapSelect: () {
               if(!isEditMode) return;
 
               setState(() {
@@ -260,6 +261,26 @@ class _ListScreenState extends State<ListScreen> {
                 } else {
                   selectedTaskIds.add(task.id);
                 }
+              });
+            },
+            onTapUpdateName: () async {
+              final newName = await showDialog<String>(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => ChangeTaskNameDialog(
+                  title: "Change '${task.name}' name",
+                ),
+              );
+
+              if (newName != null && newName.trim().isNotEmpty) {
+                appState.updateTaskName(task, newName);
+              }
+            },
+            onTapInstantDelete: () {
+              if(!isEditMode) return;
+
+              setState(() {
+                appState.deleteTask(widget.listId, task.id);
               });
             },
             isEditMode: isEditMode,
@@ -293,8 +314,32 @@ class _ListScreenState extends State<ListScreen> {
           child: FinishedCard(
             cardName: task.name,
             index: index,
-            onTap: () {
+            onTapSelect: () {
               if(!isEditMode) return;
+
+              setState(() {
+                if (selectedTaskIds.contains(task.id)) {
+                  selectedTaskIds.remove(task.id);
+                } else {
+                  selectedTaskIds.add(task.id);
+                }
+              });
+            },
+            onTapUpdateName: () async {
+              final newName = await showDialog<String>(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => ChangeTaskNameDialog(
+                  title: "Change '${task.name}' name",
+                ),
+              );
+
+              if (newName != null && newName.trim().isNotEmpty) {
+                appState.updateTaskName(task, newName);
+              }
+            },
+            onTapInstantDelete: () {              
+            if(!isEditMode) return;
 
               setState(() {
                 if (selectedTaskIds.contains(task.id)) {
@@ -311,6 +356,8 @@ class _ListScreenState extends State<ListScreen> {
       },
     );
   }
+
+  // ---------------- FINISHED TASKS ----------------
 
   Widget _buildEditActions(MyAppState appState) {
     return Container(

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class BaseTaskCard extends StatelessWidget {
   final String title;
   final int index;
-  final VoidCallback onTap;
+  final VoidCallback onTapSelect;
+  final VoidCallback onTapUpdateName;
+  final VoidCallback onTapInstantDelete;
   final bool isEditMode;
   final bool isSelected;
   final bool showDragHandle;
@@ -14,7 +16,9 @@ class BaseTaskCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.index,
-    required this.onTap,
+    required this.onTapSelect,
+    required this.onTapUpdateName,
+    required this.onTapInstantDelete,
     required this.isEditMode,
     required this.isSelected,
     required this.showDragHandle,
@@ -25,7 +29,6 @@ class BaseTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // onTap: isEditMode ? onTap : null,
       child: Card(
         color: backgroundColor,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -36,15 +39,32 @@ class BaseTaskCard extends StatelessWidget {
           children: [
             // RADIO BUTTON
             if (isEditMode)
-              IconButton(
-                onPressed: onTap,
-                icon: Icon(
-                  isSelected
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_unchecked,
-                  color: Colors.white,
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: onTapSelect,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color: Colors.white,
+                    ),
+                  ),IconButton(
+                    onPressed: onTapUpdateName,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
+
 
             // TEXT
             Expanded(
@@ -72,8 +92,17 @@ class BaseTaskCard extends StatelessWidget {
               ),
 
             // SPACER TO ALIGN FINISHED CARDS
-            if (isEditMode && !showDragHandle)
-              const SizedBox(width: 48),
+            if (isEditMode)
+                IconButton(
+                  onPressed: onTapInstantDelete,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(
+                    Icons.delete_forever,
+                    color: Colors.white,
+                  ),
+                ),
           ],
         ),
       ),

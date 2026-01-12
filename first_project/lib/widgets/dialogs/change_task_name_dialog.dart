@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ConfirmDialog extends StatelessWidget {
+class ChangeTaskNameDialog extends StatelessWidget {
   final String title;
-  final String message;
-  final VoidCallback onConfirm;
 
-  const ConfirmDialog({
+  ChangeTaskNameDialog({
     super.key,
     required this.title,
-    required this.message,
-    required this.onConfirm,
   });
+
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +32,14 @@ class ConfirmDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              message,
-              style: const TextStyle(
-                color: Color(0xFF9BB3D1),
-                fontSize: 16,
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter new name',
+                hintStyle: TextStyle(color: Color(0xFF9BB3D1)),
               ),
             ),
             const SizedBox(height: 24),
@@ -55,14 +56,15 @@ class ConfirmDialog extends StatelessWidget {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE3392F),
+                    backgroundColor: Color(0xFF3A7AFE),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
-                    onConfirm();
+                    if(_controller.text.isNotEmpty) {
+                      Navigator.pop(context, _controller.text); // ✅ RETURN VALUE
+                     } 
                   },
                   child: const Text(
-                    "Delete",
+                    "Confirm",
                     style: TextStyle(
                       color: Colors.white
                     ),
