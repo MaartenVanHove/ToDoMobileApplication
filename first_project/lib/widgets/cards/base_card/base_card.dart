@@ -25,7 +25,7 @@ class BaseTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: isEditMode ? onTap : null,
+      // onTap: isEditMode ? onTap : null,
       child: Card(
         color: backgroundColor,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

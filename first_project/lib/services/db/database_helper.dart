@@ -129,6 +129,16 @@ class DatabaseServices {
     );
   }
 
+  Future<void> updateTaskName(int id, String name) async {
+    final db = await database;
+    await db.update(
+      'tasks', 
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id]
+    );
+  }
+
   Future<void> deleteCollection(int id) async {
     final db = await database;
     await db.delete(

@@ -315,13 +315,12 @@ class _ListScreenState extends State<ListScreen> {
   Widget _buildEditActions(MyAppState appState) {
     return Container(
       padding: const EdgeInsets.all(12),
-      // color: const Color(0xFF0A0F1F),
       child: Row(
         children: [
           Expanded(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Color(0xFFE3392F),
               ),
               onPressed: selectedTaskIds.isEmpty
                   ? null
@@ -330,23 +329,36 @@ class _ListScreenState extends State<ListScreen> {
                         appState.deleteTask(widget.listId, id);
                       }
                       setState(() {
-                        selectedTaskIds.clear();
+                        _resetEditMode();
                         isEditMode = false;
                       });
                     },
-              child: Text("Delete ${selectedTaskIds.length}"),
+              child: Text(
+                "Delete ${selectedTaskIds.length}",
+                style: TextStyle(
+                  color: selectedTaskIds.isNotEmpty ? Colors.white : Color(0xFF9BB3D1)
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF162238)
+              ),
               onPressed: () {
                 setState(() {
-                  selectedTaskIds.clear();
+                  _resetEditMode();
                   isEditMode = false;
                 });
               },
-              child: const Text("Cancel"),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.white
+                ),
+              ),
             ),
           ),
         ],
