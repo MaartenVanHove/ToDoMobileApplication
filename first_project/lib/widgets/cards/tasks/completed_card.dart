@@ -1,7 +1,8 @@
-import 'package:first_project/widgets/cards/base_card/base_card.dart';
+// lib/widgets/completed_card.dart
+import 'package:first_project/widgets/cards/tasks/base_card/base_card.dart';
 import 'package:flutter/material.dart';
 
-class TodoCard extends StatelessWidget {
+class FinishedCard extends StatelessWidget {
   final String cardName;
   final int index;
   final VoidCallback onTapSelect;
@@ -10,7 +11,7 @@ class TodoCard extends StatelessWidget {
   final bool isEditMode;
   final bool isSelected;
 
-  const TodoCard({
+  const FinishedCard({
     super.key,
     required this.cardName,
     required this.index,
@@ -31,13 +32,15 @@ class TodoCard extends StatelessWidget {
       onTapInstantDelete: onTapInstantDelete,
       isEditMode: isEditMode,
       isSelected: isSelected,
-      showDragHandle: true,
-      backgroundColor: const Color(0xFF1E2F4D),
-      textStyle: const TextStyle(
+      showDragHandle: false,
+      backgroundColor: const Color(0xFF162238),
+      textStyle: TextStyle(
         fontSize: 18,
-        color: Colors.white,
+        decoration: TextDecoration.lineThrough,
+        color: Colors.grey.shade700,
       ),
     );
   }
 }
+
 

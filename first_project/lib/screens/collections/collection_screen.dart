@@ -2,14 +2,19 @@ import 'package:first_project/models/collection.dart';
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/list_screen.dart';
-import 'package:first_project/widgets/cards/list_card.dart';
+import 'package:first_project/widgets/cards/lists/list_card.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
 
-class CollectionsScreen extends StatelessWidget {
+class CollectionsScreen extends StatefulWidget {
 
+  @override
+  State<CollectionsScreen> createState() => _CollectionsScreenState();
+}
+
+class _CollectionsScreenState extends State<CollectionsScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<MyAppState>();
@@ -96,10 +101,9 @@ class CollectionsScreen extends StatelessWidget {
       ),
     );
   }
-  
 
   Widget _buildListView(MyAppState appState, int collectionId) {
-    final todoListsInCollection = appState.todoLists[collectionId] ?? [];
+    final todoListsInCollection = appState.lists[collectionId] ?? [];
 
     if (todoListsInCollection.isEmpty) {
       return const Padding(
@@ -112,37 +116,55 @@ class CollectionsScreen extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 140,
-      child: ListView.builder(
+      height: 180,
+      child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: todoListsInCollection.length,
+        onReorder: (oldIndex, newIndex) {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+
+          setState(() {
+            final movedList = todoListsInCollection.removeAt(oldIndex);
+            todoListsInCollection.insert(newIndex, movedList);
+          });
+
+          // OPTIONAL: persist order to DB
+          // appState.updateListOrder(collectionId, todoListsInCollection);
+        },
         itemBuilder: (context, index) {
           final todoList = todoListsInCollection[index];
 
-          return ListCard(
-            listName: todoList.name,
-            onTap: () => _navigateToListScreen(
-              context, 
-              todoList.id,         // pass the actual list ID here
-              todoList.name,
-            ),
-            onPressed: () => showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => ConfirmDialog(
-                title: "Delete ${todoList.name}?",
-                message: "This will permanently remove the list.",
-                onConfirm: () {
-                  appState.deleteList(collectionId, todoList.id);
-                },
+          return Padding(
+            key: ValueKey(todoList.id), // ✅ REQUIRED
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: ListCard(
+              listName: todoList.name,
+              onTap: () => _navigateToListScreen(
+                context,
+                todoList.id,
+                todoList.name,
               ),
-            )
+              index: index,
+              onPressed: () => showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => ConfirmDialog(
+                  title: "Delete ${todoList.name}?",
+                  message: "This will permanently remove the list.",
+                  onConfirm: () {
+                    appState.deleteList(collectionId, todoList.id);
+                  },
+                ),
+              ),
+            ),
           );
         },
       ),
     );
-  }
 
+  }
 
   AppBar _buildTitle() {
     return AppBar(
@@ -175,7 +197,6 @@ class CollectionsScreen extends StatelessWidget {
       ),
     );
   }
-
 
   void _navigateToAddCollectionScreen(BuildContext context) {
     Navigator.push(

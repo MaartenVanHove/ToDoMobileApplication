@@ -10,7 +10,7 @@ class MyAppState extends ChangeNotifier {
   List<Collection> collections = [];
 
   // Map<collectionId, List<TodoList>>
-  Map<int, List<TodoList>> todoLists = {};
+  Map<int, List<TodoList>> lists = {};
 
   // Map<listId, List<Task>>
   Map<int, List<Task>> tasks = {};
@@ -37,16 +37,25 @@ class MyAppState extends ChangeNotifier {
   // Load all lists for a given collection
   Future<void> loadLists(int collectionId) async {
     final listMaps = await db.getAllTodoLists(collectionId);
-    todoLists[collectionId] =
+    lists[collectionId] =
         listMaps.map((e) => TodoList.fromMap(e)).toList();
 
     // Load tasks for each list in this collection
-    for (var list in todoLists[collectionId]!) {
+    for (var list in lists[collectionId]!) {
       await loadTasks(list.id);
     }
 
     notifyListeners();
   }
+
+  TodoList? getListById(int listId) {
+  for (var collectionLists in lists.values) {
+    for (var list in collectionLists) {
+      if (list.id == listId) return list;
+    }
+  }
+  return null; // not found
+}
 
   // Load tasks for a given list
   Future<void> loadTasks(int listId) async {
@@ -67,7 +76,7 @@ class MyAppState extends ChangeNotifier {
   Future<void> deleteCollection(int collectionId) async {
     await db.deleteCollection(collectionId);
     collections.removeWhere((c) => c.id == collectionId);
-    todoLists.remove(collectionId);
+    lists.remove(collectionId);
     notifyListeners();
   }
 
@@ -75,8 +84,8 @@ class MyAppState extends ChangeNotifier {
   Future<int> createList(String name, int collectionId) async {
     final id = await db.addTodoList(name, collectionId);
     final newList = TodoList(id: id, name: name, collectionId: collectionId);
-    todoLists.putIfAbsent(collectionId, () => []);
-    todoLists[collectionId]!.insert(0, newList);
+    lists.putIfAbsent(collectionId, () => []);
+    lists[collectionId]!.insert(0, newList);
     tasks[id] = [];
     notifyListeners();
     return id;
@@ -85,7 +94,7 @@ class MyAppState extends ChangeNotifier {
   // DELETE LIST
   Future<void> deleteList(int collectionId, int listId) async {
     await db.deleteTodoList(listId);
-    todoLists[collectionId]?.removeWhere((list) => list.id == listId);
+    lists[collectionId]?.removeWhere((list) => list.id == listId);
     tasks.remove(listId);
     notifyListeners();
   }
@@ -134,6 +143,21 @@ class MyAppState extends ChangeNotifier {
         listId: task.listId,
         name: name,
         isFinished: task.isFinished
+      );
+      notifyListeners();
+    }
+  }
+
+  // UPDATE LIST NAME
+  Future<void> updateListName(TodoList list, String name) async {
+    db.updateListName(list.id, name);
+    final collection = lists[list.collectionId]!;
+    final index = collection.indexWhere((l) => l.id == list.id);
+    if(index != -1) {
+      collection[index] = TodoList(
+        id: list.id, 
+        collectionId: list.collectionId,
+        name: name
       );
       notifyListeners();
     }

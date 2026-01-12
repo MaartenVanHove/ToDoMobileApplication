@@ -119,6 +119,16 @@ class DatabaseServices {
     );
   }
 
+  Future<void> updateListName(int id, String name) async {
+    final db = await database;
+    await db.update(
+      'todo_lists',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id]
+    );
+  }
+
   Future<void> updateTaskFinished(int id, bool finished) async {
     final db = await database;
     await db.update(

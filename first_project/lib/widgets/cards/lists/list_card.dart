@@ -4,12 +4,14 @@ class ListCard extends StatelessWidget {
   final String listName;
   final VoidCallback? onTap;
   final VoidCallback? onPressed;
+  final int index;
 
   const ListCard({
     super.key,
     required this.listName,
     required this.onTap,
     required this.onPressed,
+    required this.index
   });
 
   @override
@@ -28,12 +30,21 @@ class ListCard extends StatelessWidget {
           ),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              
+            
+              ReorderableDragStartListener(
+                index: index,
+                child: Icon(
+                  Icons.drag_handle,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+
               // 🔲 IMAGE PLACEHOLDER
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                 child: Container(
                   width: 150,
                   height: 80,

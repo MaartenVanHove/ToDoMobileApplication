@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/models/task.dart';
-import 'package:first_project/widgets/cards/todo_card.dart';
-import 'package:first_project/widgets/cards/completed_card.dart';
+import 'package:first_project/widgets/cards/tasks/todo_card.dart';
+import 'package:first_project/widgets/cards/tasks/completed_card.dart';
 
 class ListScreen extends StatefulWidget {
   final int listId;
@@ -47,8 +47,10 @@ class _ListScreenState extends State<ListScreen> {
     final todoTasks = allTasks.where((task) => !task.isFinished).toList();
     final finishedTasks = allTasks.where((task) => task.isFinished).toList();
 
+    final list = appState.getListById(widget.listId);
+
     return Scaffold(
-      appBar: _buildTitle(widget.listName),
+      appBar: _buildTitle(list?.name ?? '', appState),
       body: SafeArea(
         child: Column(
           children: [
@@ -86,10 +88,9 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
-  AppBar _buildTitle(String title) {
+  AppBar _buildTitle(String title, MyAppState appState) {
     return AppBar(
       backgroundColor: const Color(0xFF0A0F1F),
-      // 1. Keep the title simple so it centers perfectly
       title: Text(
         title,
         style: const TextStyle(
@@ -99,25 +100,30 @@ class _ListScreenState extends State<ListScreen> {
         ),
       ),
       centerTitle: true,
-      
-      // 2. Use 'actions' to push the icon to the far right
       actions: [
         IconButton(
-          icon: const Icon(
-            Icons.menu, color: 
-            Colors.white70, 
-            size: 28
-          ),
-          onPressed: () {
-            // Logic to edit the title
-            print("Open menu");
+          icon: const Icon(Icons.edit, color: Colors.white70, size: 28),
+          onPressed: () async {
+            final newName = await showDialog<String>(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => ChangeTaskNameDialog(
+                title: "Change '$title' title",
+              ),
+            );
+
+            if (newName == null || newName.trim().isEmpty) return;
+
+            final list = appState.getListById(widget.listId);
+            if (list != null) {
+              appState.updateListName(list, newName.trim());
+            }
           },
         ),
-        // Optional: Add a small bit of padding so the icon isn't touching the screen edge
-        const SizedBox(width: 8), 
       ],
     );
   }
+
 
   Widget _buildEditIcon() {
     return Row(
