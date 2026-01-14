@@ -129,6 +129,16 @@ class DatabaseServices {
     );
   }
 
+  Future<void> updateCollectionName(int id, String name) async {
+    final db = await database;
+    await db.update(
+      'collection',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id]
+    );
+  }
+
   Future<void> updateTaskFinished(int id, bool finished) async {
     final db = await database;
     await db.update(

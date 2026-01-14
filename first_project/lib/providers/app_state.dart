@@ -163,6 +163,19 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+    // UPDATE COLLECTION NAME
+  Future<void> updateCollectionName(Collection collection, String name) async {
+    db.updateCollectionName(collection.id, name);
+    final index = collections.indexWhere((c) => c.id == collection.id);
+    if (index != -1) {
+      collections[index] = new Collection(
+        id: collection.id, 
+        name: name
+      );
+      notifyListeners();
+    }
+  }
+
   void updateTaskOrder(int listId, List<Task> reorderedTodos) {
     final all = tasks[listId] ?? [];
 

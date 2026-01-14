@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ChangeTaskNameDialog extends StatelessWidget {
+class ChangeNameDialog extends StatelessWidget {
   final String title;
 
-  ChangeTaskNameDialog({
+  ChangeNameDialog.ChangeNameDialog({
     super.key,
     required this.title,
   });

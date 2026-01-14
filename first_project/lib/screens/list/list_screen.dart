@@ -107,7 +107,7 @@ class _ListScreenState extends State<ListScreen> {
             final newName = await showDialog<String>(
               context: context,
               barrierDismissible: false,
-              builder: (_) => ChangeTaskNameDialog(
+              builder: (_) => ChangeNameDialog.ChangeNameDialog(
                 title: "Change '$title' title",
               ),
             );
@@ -242,7 +242,7 @@ class _ListScreenState extends State<ListScreen> {
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
-
+        
         return Dismissible(
           key: ValueKey(task.id),
           direction: isEditMode
@@ -273,7 +273,7 @@ class _ListScreenState extends State<ListScreen> {
               final newName = await showDialog<String>(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => ChangeTaskNameDialog(
+                builder: (_) => ChangeNameDialog.ChangeNameDialog(
                   title: "Change '${task.name}' name",
                 ),
               );
@@ -335,7 +335,7 @@ class _ListScreenState extends State<ListScreen> {
               final newName = await showDialog<String>(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => ChangeTaskNameDialog(
+                builder: (_) => ChangeNameDialog.ChangeNameDialog(
                   title: "Change '${task.name}' name",
                 ),
               );
@@ -344,15 +344,11 @@ class _ListScreenState extends State<ListScreen> {
                 appState.updateTaskName(task, newName);
               }
             },
-            onTapInstantDelete: () {              
-            if(!isEditMode) return;
+             onTapInstantDelete: () {
+              if(!isEditMode) return;
 
               setState(() {
-                if (selectedTaskIds.contains(task.id)) {
-                  selectedTaskIds.remove(task.id);
-                } else {
-                  selectedTaskIds.add(task.id);
-                }
+                appState.deleteTask(widget.listId, task.id);
               });
             },
             isEditMode: isEditMode,

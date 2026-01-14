@@ -3,6 +3,7 @@ import 'package:first_project/screens/add_screens/collection/add_new_collection.
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/widgets/cards/lists/list_card.dart';
+import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,13 +39,35 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        collection.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 26,
-                        ),
+                      Row(children: [
+                          Text(
+                            collection.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 26,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              final newName = await showDialog<String>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (_) => ChangeNameDialog.ChangeNameDialog(
+                                  title: "Change '${collection.name}' title",
+                                ),
+                              );
+                              if (newName != null && newName.trim().isNotEmpty) {
+                                appState.updateCollectionName(collection, newName);
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.edit,
+                              color: const Color(0xFF9BB3D1),
+                              size: 24,
+                            ),
+                          ),
+                        ],
                       ),
                       
                       Row(

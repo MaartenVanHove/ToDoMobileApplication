@@ -28,83 +28,82 @@ class BaseTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Card(
-        color: backgroundColor,
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          mainAxisAlignment: isEditMode
-              ? MainAxisAlignment.start
-              : MainAxisAlignment.spaceBetween,
-          children: [
-            // RADIO BUTTON
-            if (isEditMode)
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: onTapSelect,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      color: Colors.white,
-                    ),
-                  ),IconButton(
-                    onPressed: onTapUpdateName,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-
-
-            // TEXT
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  title,
-                  style: textStyle,
-                ),
-              ),
-            ),
-
-            // DRAG HANDLE
-            if (showDragHandle && !isEditMode)
-              ReorderableDragStartListener(
-                index: index,
-                child: const Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(
-                    Icons.drag_handle,
-                    color: Colors.white70,
-                    size: 28,
-                  ),
-                ),
-              ),
-
-            // SPACER TO ALIGN FINISHED CARDS
-            if (isEditMode)
+    return Card(
+      
+      color: backgroundColor,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisAlignment: isEditMode
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.spaceBetween,
+        children: [
+          // RADIO BUTTON
+          if (isEditMode)
+            Row(
+              children: [
                 IconButton(
-                  onPressed: onTapInstantDelete,
+                  onPressed: onTapSelect,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   visualDensity: VisualDensity.compact,
                   icon: Icon(
-                    Icons.delete_forever,
+                    isSelected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                    color: Colors.white,
+                  ),
+                ),IconButton(
+                  onPressed: onTapUpdateName,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(
+                    Icons.edit,
                     color: Colors.white,
                   ),
                 ),
-          ],
-        ),
+              ],
+            ),
+
+
+          // TEXT
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                title,
+                style: textStyle,
+              ),
+            ),
+          ),
+
+          // DRAG HANDLE
+          if (showDragHandle && !isEditMode)
+            ReorderableDragStartListener(
+              index: index,
+              child: const Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: Icon(
+                  Icons.drag_handle,
+                  color: Colors.white70,
+                  size: 28,
+                ),
+              ),
+            ),
+
+          // SPACER TO ALIGN FINISHED CARDS
+          if (isEditMode)
+              IconButton(
+                onPressed: onTapInstantDelete,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  Icons.delete_forever,
+                  color: Colors.white,
+                ),
+              ),
+        ],
       ),
     );
   }
