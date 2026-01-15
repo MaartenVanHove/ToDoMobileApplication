@@ -81,12 +81,23 @@ class MyAppState extends ChangeNotifier {
   }
 
   // CREATE LIST inside a collection
-  Future<int> createList(String name, int collectionId) async {
-    final id = await db.addTodoList(name, collectionId);
-    final newList = TodoList(id: id, name: name, collectionId: collectionId);
+  Future<int> createList(String name, int collectionId, String? imagePath) async {
+    // 1. Save to Database (Ensure DatabaseServices.addTodoList accepts imagePath)
+    final id = await db.addTodoList(imagePath, name, collectionId);
+    
+    // 2. Create the model instance
+    final newList = TodoList(
+      id: id, 
+      name: name, 
+      collectionId: collectionId, 
+      imagePath: imagePath, // Make sure your TodoList model has this field
+    );
+    
+    // 3. Update local state
     lists.putIfAbsent(collectionId, () => []);
     lists[collectionId]!.insert(0, newList);
     tasks[id] = [];
+    
     notifyListeners();
     return id;
   }
@@ -157,7 +168,8 @@ class MyAppState extends ChangeNotifier {
       collection[index] = TodoList(
         id: list.id, 
         collectionId: list.collectionId,
-        name: name
+        name: name,
+        imagePath: list.imagePath,
       );
       notifyListeners();
     }

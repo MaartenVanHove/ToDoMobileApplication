@@ -19,7 +19,7 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3, // 
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -34,13 +34,14 @@ class DatabaseServices {
     ''');
 
     await db.execute('''
-      CREATE TABLE todo_lists (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        collection_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE
-      )
-    ''');
+        CREATE TABLE todo_lists (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          collection_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          image_path TEXT,
+          FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE
+        )
+      ''');
 
     await db.execute('''
       CREATE TABLE tasks (
@@ -66,6 +67,14 @@ class DatabaseServices {
         ALTER TABLE todo_lists
         ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0
       ''');
+
+
+      if (oldVersion < 3) {
+        await db.execute('''
+          ALTER TABLE todo_lists 
+          ADD COLUMN image_path TEXT
+        ''');
+      }
     }
   }
 
@@ -75,13 +84,14 @@ class DatabaseServices {
     return await db.insert('collection', {'name': name});
   }
 
-  Future<int> addTodoList(String name, int collectionId) async {
+  Future<int> addTodoList(String? imagePath, String name, int collectionId) async {
     final db = await database;
     return await db.insert(
       'todo_lists',
       {
         'collection_id': collectionId,
         'name': name,
+        'image_path': imagePath,
       },
     );
   }

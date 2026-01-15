@@ -29,7 +29,6 @@ class BaseTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      
       color: backgroundColor,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(

@@ -1,7 +1,9 @@
+import 'dart:io'; // Required for File()
 import 'package:flutter/material.dart';
 
 class ListCard extends StatelessWidget {
   final String listName;
+  final String? imagePath; 
   final VoidCallback? onTap;
   final VoidCallback? onPressed;
   final int index;
@@ -9,9 +11,10 @@ class ListCard extends StatelessWidget {
   const ListCard({
     super.key,
     required this.listName,
+    this.imagePath, 
     required this.onTap,
     required this.onPressed,
-    required this.index
+    required this.index,
   });
 
   @override
@@ -32,17 +35,19 @@ class ListCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-            
               ReorderableDragStartListener(
                 index: index,
-                child: Icon(
-                  Icons.drag_handle,
-                  color: Colors.white70,
-                  size: 28,
+                child: const Padding(
+                  padding: EdgeInsets.only(top: 4.0),
+                  child: Icon(
+                    Icons.drag_handle,
+                    color: Colors.white70,
+                    size: 28,
+                  ),
                 ),
               ),
 
-              // 🔲 IMAGE PLACEHOLDER
+              // 🖼️ UPDATED IMAGE SECTION
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                 child: Container(
@@ -51,18 +56,27 @@ class ListCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF2B3F66),
                     borderRadius: BorderRadius.circular(12),
+                    // We use decorationImage to make sure the image fits nicely
+                    image: imagePath != null
+                        ? DecorationImage(
+                            image: FileImage(File(imagePath!)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
-                  child: const Icon(
-                    Icons.image_outlined,
-                    size: 40,
-                    color: Color(0xFF9BB3D1),
-                  ),
+                  child: imagePath == null
+                      ? const Icon(
+                          Icons.image_outlined,
+                          size: 40,
+                          color: Color(0xFF9BB3D1),
+                        )
+                      : null, // If image exists, don't show the icon
                 ),
               ),
 
               // 📝 LIST NAME
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
                 child: Text(
                   listName,
                   textAlign: TextAlign.center,

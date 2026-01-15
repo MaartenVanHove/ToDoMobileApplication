@@ -152,24 +152,22 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             final movedList = todoListsInCollection.removeAt(oldIndex);
             todoListsInCollection.insert(newIndex, movedList);
           });
-
-          // OPTIONAL: persist order to DB
-          // appState.updateListOrder(collectionId, todoListsInCollection);
         },
         itemBuilder: (context, index) {
           final todoList = todoListsInCollection[index];
 
           return Padding(
-            key: ValueKey(todoList.id), // ✅ REQUIRED
+            key: ValueKey(todoList.id),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ListCard(
               listName: todoList.name,
+              imagePath: todoList.imagePath, // 👈 THE CRITICAL ADDITION
+              index: index,
               onTap: () => _navigateToListScreen(
                 context,
                 todoList.id,
                 todoList.name,
               ),
-              index: index,
               onPressed: () => showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -186,7 +184,6 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
         },
       ),
     );
-
   }
 
   AppBar _buildTitle() {

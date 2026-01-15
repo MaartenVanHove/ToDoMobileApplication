@@ -24,11 +24,9 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
 
   // ---------------- IMAGE LOGIC ----------------
 
+  // The logic that takes place to pick a image:
   Future<void> _pickImage(ImageSource source) async {
-    try {
-      // Small delay ensures the native side is ready after the bottom sheet closes
-      await Future.delayed(const Duration(milliseconds: 100)); 
-      
+    try {      
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         maxWidth: 1000,
@@ -42,7 +40,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
         debugPrint("Picked path: ${pickedFile.path}");
       }
     } catch (error) {
-      debugPrint("Error picking image: $error");
+      debugPrint("Error. Unable picking image: $error");
     }
   }
 
@@ -157,7 +155,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
                   controller: controller,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: "Enter list name",
+                    labelText: "Enter list name *",
                     labelStyle: const TextStyle(color: Colors.white54),
                     filled: true,
                     fillColor: const Color(0xFF162238),
@@ -194,7 +192,9 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     if (input.isEmpty) return;
 
     // Passing the file path to your appState
-    final newListId = await appState.createList(input, widget.collectionId);
+    final newListId = await appState.createList(
+      input, widget.collectionId, _imageFile?.path
+    );
 
     if (mounted) {
       Navigator.pushReplacement(
