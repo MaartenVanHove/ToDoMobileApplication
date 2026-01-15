@@ -34,15 +34,16 @@ class ChangeNameDialog extends StatelessWidget {
             const SizedBox(height: 12),
             TextField(
               controller: _controller,
-              autofocus: true,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter new name',
-                hintStyle: TextStyle(color: Color(0xFF9BB3D1)),
+              decoration: InputDecoration(
+                labelText: "Enter list name",
+                labelStyle: const TextStyle(color: Colors.white54),
+                filled: true,
+                fillColor: const Color(0xFF162238),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

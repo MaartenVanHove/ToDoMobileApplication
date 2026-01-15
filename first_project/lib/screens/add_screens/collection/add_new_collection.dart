@@ -50,15 +50,13 @@ class AddNewCollectionScreen extends StatelessWidget {
   Widget _buildInputField() {
     return TextField(
       controller: controller,
-      style: TextStyle(
-        color: Colors.white,
-      ),
-      decoration: const InputDecoration(
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
         labelText: "Enter list name",
-        border: OutlineInputBorder(),
-        labelStyle: TextStyle(
-          color: Color(0xFF162238),
-        )
+        labelStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: const Color(0xFF162238),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
