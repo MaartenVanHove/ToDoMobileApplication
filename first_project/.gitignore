@@ -37,6 +37,11 @@ android/key.properties
 /build/
 /coverage/
 
+# Private Key files
+android/key.properties
+android/app/*.jks
+key.env
+
 # Symbolication related
 app.*.symbols
 

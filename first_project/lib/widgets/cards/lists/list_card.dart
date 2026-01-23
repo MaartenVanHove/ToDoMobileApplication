@@ -1,9 +1,9 @@
-import 'dart:io'; // Required for File()
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ListCard extends StatelessWidget {
   final String listName;
-  final String? imagePath; 
+  final String? imagePath;
   final VoidCallback? onTap;
   final VoidCallback? onPressed;
   final int index;
@@ -11,7 +11,7 @@ class ListCard extends StatelessWidget {
   const ListCard({
     super.key,
     required this.listName,
-    this.imagePath, 
+    this.imagePath,
     required this.onTap,
     required this.onPressed,
     required this.index,
@@ -23,22 +23,56 @@ class ListCard extends StatelessWidget {
       onTap: onTap,
       onLongPress: onPressed,
       borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
+      child: Container(
         width: 200,
         height: 180,
-        child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
           color: const Color(0xFF1E2F4D),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ReorderableDragStartListener(
+          borderRadius: BorderRadius.circular(16),
+          // 🖼️ THE FULL BACKGROUND IMAGE
+          image: imagePath != null
+              ? DecorationImage(
+                  image: FileImage(File(imagePath!)),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withValues(alpha: 0.35),
+                    BlendMode.darken,
+                  ),
+                )
+              : null,
+        ),
+        child: Stack(
+          children: [
+            // 📝 LIST NAME (Bottom Center)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  listName,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white, // White looks better over images
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(blurRadius: 4, color: Colors.black), // Adds a glow for readability
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // 🖐️ DRAG HANDLE (Top Center)
+            Align(
+              alignment: Alignment.topCenter,
+              child: ReorderableDragStartListener(
                 index: index,
                 child: const Padding(
-                  padding: EdgeInsets.only(top: 4.0),
+                  padding: EdgeInsets.only(top: 8.0),
                   child: Icon(
                     Icons.drag_handle,
                     color: Colors.white70,
@@ -46,51 +80,18 @@ class ListCard extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
 
-              // 🖼️ UPDATED IMAGE SECTION
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                child: Container(
-                  width: 150,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2B3F66),
-                    borderRadius: BorderRadius.circular(12),
-                    // We use decorationImage to make sure the image fits nicely
-                    image: imagePath != null
-                        ? DecorationImage(
-                            image: FileImage(File(imagePath!)),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: imagePath == null
-                      ? const Icon(
-                          Icons.image_outlined,
-                          size: 40,
-                          color: Color(0xFF9BB3D1),
-                        )
-                      : null, // If image exists, don't show the icon
+            // 🖼️ ICON PLACEHOLDER (Only if no image exists)
+            if (imagePath == null)
+              const Center(
+                child: Icon(
+                  Icons.image_outlined,
+                  size: 40,
+                  color: Color(0xFF9BB3D1),
                 ),
               ),
-
-              // 📝 LIST NAME
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-                child: Text(
-                  listName,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF9BB3D1),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
