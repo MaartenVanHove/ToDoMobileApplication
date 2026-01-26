@@ -178,7 +178,7 @@ class _ListScreenState extends State<ListScreen> {
           hintText: 'Enter new task',
           hintStyle: TextStyle(
             color: Color(0xFF9BB3D1),
-          )
+          ),
         ),
       ),
     );

@@ -1,7 +1,7 @@
 name: first_project
 description: "List Creator Application"
 publish_to: "none"
-version: 0.8.0
+version: 1.0.0+2
 
 environment:
   sdk: ^3.9.0

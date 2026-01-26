@@ -30,6 +30,13 @@ class BaseTaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isSelected ? Colors.blueAccent : Colors.white24,
+          width: 1
+        )
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         mainAxisAlignment: isEditMode
@@ -83,7 +90,7 @@ class BaseTaskCard extends StatelessWidget {
               child: const Padding(
                 padding: EdgeInsets.only(right: 12),
                 child: Icon(
-                  Icons.drag_handle,
+                  Icons.drag_indicator_sharp,
                   color: Colors.white70,
                   size: 28,
                 ),
