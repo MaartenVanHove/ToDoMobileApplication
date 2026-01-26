@@ -5,6 +5,7 @@ import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/widgets/cards/lists/list_card.dart';
 import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
+import 'package:first_project/widgets/cards/lists/add_list_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
@@ -116,7 +117,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                     ],
                   ),
                 ),
-                _buildListView(appState, collection.id),
+                _buildListView(context, appState, collection.id),
               ],
             );
           },
@@ -125,25 +126,25 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
     );
   }
 
-  Widget _buildListView(MyAppState appState, int collectionId) {
+  Widget _buildListView(
+    BuildContext context,
+    MyAppState appState,
+    int collectionId,
+  ) {
     final todoListsInCollection = appState.lists[collectionId] ?? [];
-
-    if (todoListsInCollection.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          'No lists yet',
-          style: TextStyle(color: Colors.grey),
-        ),
-      );
-    }
 
     return SizedBox(
       height: 180,
       child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: todoListsInCollection.length,
+        itemCount: todoListsInCollection.length + 1, // 👈 +1 for Add card
         onReorder: (oldIndex, newIndex) {
+          // 🚫 Prevent dragging the AddListCard
+          if (oldIndex == todoListsInCollection.length ||
+              newIndex == todoListsInCollection.length) {
+            return;
+          }
+
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
@@ -154,6 +155,19 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
           });
         },
         itemBuilder: (context, index) {
+          // ➕ ADD LIST CARD (always last)
+          if (index == todoListsInCollection.length) {
+            return Padding(
+              key: const ValueKey('add_list_card'),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: AddListCard(
+                onTap: () =>
+                    _navigateToAddListScreen(context, collectionId),
+              ),
+            );
+          }
+
+          // 📋 NORMAL LIST CARD
           final todoList = todoListsInCollection[index];
 
           return Padding(
@@ -161,7 +175,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ListCard(
               listName: todoList.name,
-              imagePath: todoList.imagePath, // 👈 THE CRITICAL ADDITION
+              imagePath: todoList.imagePath,
               index: index,
               onTap: () => _navigateToListScreen(
                 context,
@@ -185,6 +199,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
       ),
     );
   }
+
 
   AppBar _buildTitle() {
     return AppBar(
