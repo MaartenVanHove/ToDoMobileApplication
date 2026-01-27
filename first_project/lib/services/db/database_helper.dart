@@ -19,7 +19,7 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 3, // 
+      version: 4, // 
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -49,6 +49,7 @@ class DatabaseServices {
         list_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         is_finished INTEGER NOT NULL DEFAULT 0,
+        image_path TEXT,
         FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
       )
     ''');
@@ -74,6 +75,10 @@ class DatabaseServices {
           ALTER TABLE todo_lists 
           ADD COLUMN image_path TEXT
         ''');
+      }
+
+      if (oldVersion < 4) {
+        // TODO:
       }
     }
   }
