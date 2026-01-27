@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
 
 class CollectionsScreen extends StatefulWidget {
-
   @override
   State<CollectionsScreen> createState() => _CollectionsScreenState();
 }
@@ -63,7 +62,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                               }
                             },
                             icon: const Icon(
-                              Icons.edit,
+                              Icons.drive_file_rename_outline,
                               color: const Color(0xFF9BB3D1),
                               size: 24,
                             ),
@@ -73,22 +72,14 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                       
                       Row(
                         children: [
-                          TextButton.icon(
+                          IconButton(
                             onPressed: () {
                               _navigateToAddListScreen(context, collection.id);
                             },
                             icon: const Icon(
                               Icons.add_circle_outline,
-                              color: Colors.white,
+                              color: const Color(0xFF9BB3D1),
                               size: 28,
-                            ),
-                            label: const Text(
-                              "List",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
                             ),
                           ),
 
@@ -137,11 +128,12 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
       height: 180,
       child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: todoListsInCollection.length + 1, // 👈 +1 for Add card
+        buildDefaultDragHandles: false,
+        itemCount: todoListsInCollection.length + 1,
         onReorder: (oldIndex, newIndex) {
-          // 🚫 Prevent dragging the AddListCard
-          if (oldIndex == todoListsInCollection.length ||
-              newIndex == todoListsInCollection.length) {
+          // Block moving the Add card
+          if (oldIndex >= todoListsInCollection.length ||
+              newIndex > todoListsInCollection.length) {
             return;
           }
 
@@ -155,7 +147,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
           });
         },
         itemBuilder: (context, index) {
-          // ➕ ADD LIST CARD (always last)
+          // ➕ ADD LIST CARD (static, last)
           if (index == todoListsInCollection.length) {
             return Padding(
               key: const ValueKey('add_list_card'),
@@ -167,7 +159,6 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             );
           }
 
-          // 📋 NORMAL LIST CARD
           final todoList = todoListsInCollection[index];
 
           return Padding(
@@ -176,7 +167,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             child: ListCard(
               listName: todoList.name,
               imagePath: todoList.imagePath,
-              index: index,
+              index: index, // used by ReorderableDragStartListener
               onTap: () => _navigateToListScreen(
                 context,
                 todoList.id,
@@ -199,6 +190,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
       ),
     );
   }
+
 
 
   AppBar _buildTitle() {

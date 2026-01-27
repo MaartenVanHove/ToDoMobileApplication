@@ -52,7 +52,7 @@ class AddNewCollectionScreen extends StatelessWidget {
       controller: controller,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: "Enter list name",
+        labelText: "Enter collection name",
         labelStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: const Color(0xFF162238),
@@ -100,7 +100,7 @@ class AddNewCollectionScreen extends StatelessWidget {
       return;
     }
 
-    // ✅ Create list inside correct collection
+    // Create list inside correct collection
     await appState.createCollection(input);
 
     // Navigate to add tasks
