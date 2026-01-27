@@ -36,7 +36,7 @@ class ChangeNameDialog extends StatelessWidget {
               controller: _controller,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: "Enter list name",
+                labelText: "Enter new name",
                 labelStyle: const TextStyle(color: Colors.white54),
                 filled: true,
                 fillColor: const Color(0xFF162238),

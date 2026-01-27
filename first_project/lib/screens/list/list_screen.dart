@@ -33,6 +33,7 @@ class _ListScreenState extends State<ListScreen> {
   @override
   void initState() {
     super.initState();
+
     // Ensure tasks are loaded once
     Future.microtask(() {
       context.read<MyAppState>().loadTasks(widget.listId);
@@ -79,9 +80,9 @@ class _ListScreenState extends State<ListScreen> {
 
             if(isEditMode) _buildEditActions(appState),
             if(!isEditMode) 
-              _buildInputField(),
-            if(!isEditMode)
-              _buildAddButton(appState),
+              _buildInputField(appState),
+            // if(!isEditMode)
+            //   _buildAddButton(appState),
           ],
         ),
       ),
@@ -165,53 +166,75 @@ class _ListScreenState extends State<ListScreen> {
 
   // ---------------- ADD TASK ----------------
 
-  Widget _buildInputField() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        controller: controller,
-        style: TextStyle(
-          color: Colors.white,
-        ),
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'Enter new task',
-          hintStyle: TextStyle(
-            color: Color(0xFF9BB3D1),
+  Widget _buildInputField(MyAppState appState) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0F1F),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // The Input Bubble
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF162238),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: TextField(
+                controller: controller,
+                style: const TextStyle(color: Colors.white),
+                onChanged: (text) => setState(() {}),
+                decoration: InputDecoration(
+                  hintText: 'Enter new Task...',
+                  hintStyle: const TextStyle(color: Color(0xFF9BB3D1)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  border: InputBorder.none, // Removes the standard line
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
+                        onPressed: () {}, // TODO: add Logic
+                      ),
+                      if (controller.text.isEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
+                          onPressed: () {}, // TODO: add logic
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          // The Circular Send Button
+          _buildAddButton(appState),
+        ],
       ),
     );
   }
 
   Widget _buildAddButton(MyAppState appState) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            final name = controller.text.trim();
-            if (name.isNotEmpty) {
-              _addNewTask(appState, name);
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6290EB),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: const Text(
-            "Add",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF6290EB),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(
+          Icons.add, // WhatsApp style switch
+          color: Colors.white,
         ),
+        onPressed: () {
+          final name = controller.text.trim();
+          if (name.isNotEmpty) {
+            _addNewTask(appState, name);
+            setState(() {}); // Refreshes to show camera/mic again
+          }
+        },
       ),
     );
   }
