@@ -78,7 +78,10 @@ class DatabaseServices {
       }
 
       if (oldVersion < 4) {
-        // TODO:
+        await db.execute('''
+          ALTER TABLE tasks 
+          ADD COLUMN image_path TEXT
+        ''');
       }
     }
   }
@@ -102,13 +105,17 @@ class DatabaseServices {
   }
 
 
-  Future<int> addTask(int listId, String name) async {
+  Future<int> addTask(String? imagePath, int listId, String name) async {
     final db = await database;
-    return await db.insert('tasks', {
-      'list_id': listId,
-      'name': name,
-      'is_finished': 0,
-    });
+    return await db.insert(
+      'tasks', 
+      {
+        'list_id': listId,
+        'name': name,
+        'is_finished': 0,
+        'image_path': imagePath,
+      }
+    );
   }
 
   Future<List<Map<String, dynamic>>> getAllCollections() async {

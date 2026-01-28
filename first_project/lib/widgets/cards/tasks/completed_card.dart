@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class FinishedCard extends StatelessWidget {
   final String cardName;
+  final String? imagePath;
   final int index;
   final VoidCallback onTapSelect;
   final VoidCallback onTapUpdateName;
@@ -14,6 +15,7 @@ class FinishedCard extends StatelessWidget {
   const FinishedCard({
     super.key,
     required this.cardName,
+    this.imagePath,
     required this.index,
     required this.onTapSelect,
     required this.onTapUpdateName,
@@ -26,6 +28,7 @@ class FinishedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseTaskCard(
       title: cardName,
+      imagePath: imagePath,
       index: index,
       onTapSelect: onTapSelect,
       onTapUpdateName: onTapUpdateName,

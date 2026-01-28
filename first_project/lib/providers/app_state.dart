@@ -111,9 +111,9 @@ class MyAppState extends ChangeNotifier {
   }
 
   // CREATE TASK
-  Future<int> addTask(int listId, String name) async {
-    final taskId = await db.addTask(listId, name);
-    final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false);
+  Future<int> addTask(int listId, String name, String? imagePath) async {
+    final taskId = await db.addTask(imagePath, listId, name);
+    final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false, imagePath: imagePath);
     tasks.putIfAbsent(listId, () => []);
     tasks[listId]!.insert(0, newTask);
     notifyListeners();
@@ -138,6 +138,7 @@ class MyAppState extends ChangeNotifier {
         listId: task.listId,
         name: task.name,
         isFinished: !task.isFinished,
+        imagePath: task.imagePath,
       );
       notifyListeners();
     }

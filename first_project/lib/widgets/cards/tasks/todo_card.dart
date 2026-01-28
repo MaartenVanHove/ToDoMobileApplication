@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class TodoCard extends StatelessWidget {
   final String cardName;
+  final String? imagePath;
   final int index;
   final VoidCallback onTapSelect;
   final VoidCallback onTapUpdateName;
@@ -13,6 +14,7 @@ class TodoCard extends StatelessWidget {
   const TodoCard({
     super.key,
     required this.cardName,
+    this.imagePath,
     required this.index,
     required this.onTapSelect,
     required this.onTapUpdateName,
@@ -25,6 +27,7 @@ class TodoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseTaskCard(
       title: cardName,
+      imagePath: imagePath,
       index: index,
       onTapSelect: onTapSelect,
       onTapUpdateName: onTapUpdateName,

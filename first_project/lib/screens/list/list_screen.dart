@@ -198,7 +198,7 @@ class _ListScreenState extends State<ListScreen> {
         color: const Color(0xFF0A0F1F),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,       
         children: [
           if(_imageFile != null) 
             Padding(
@@ -302,14 +302,17 @@ class _ListScreenState extends State<ListScreen> {
   }
   
   void _addNewTask(MyAppState appState, String name) {
-    appState.addTask(widget.listId, name);
+    print("imagePath: ${_imageFile!.path}");
+    appState.addTask(widget.listId, name, _imageFile!.path);
     controller.clear();
+    _imageFile = null;
   }
 
   // ---------------- TASKS ----------------
 
   Widget _buildTodoTasks(MyAppState appState, List<Task> tasks) {
     return ReorderableListView.builder(
+      buildDefaultDragHandles: false,
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if(oldIndex < newIndex) {
@@ -342,6 +345,9 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: TodoCard(
             cardName: task.name,
+            imagePath: task.imagePath != null 
+              ? task.imagePath
+              : null,
             index: index,
             onTapSelect: () {
               if(!isEditMode) return;
@@ -404,6 +410,9 @@ class _ListScreenState extends State<ListScreen> {
           onDismissed: (_) => appState.toggleTaskFinished(task),
           child: FinishedCard(
             cardName: task.name,
+            imagePath: task.imagePath != null 
+              ? task.imagePath
+              : null,
             index: index,
             onTapSelect: () {
               if(!isEditMode) return;
