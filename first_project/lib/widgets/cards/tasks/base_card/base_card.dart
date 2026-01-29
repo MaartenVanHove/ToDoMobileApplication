@@ -173,15 +173,15 @@ class BaseTaskCard extends StatelessWidget {
         onLongPress: isEditMode == false ? onPressedEdit : null,
         child: Row(
           children: [
-            if (isEditMode)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: IconButton(
-                  onPressed: onTapUpdateName,
-                  visualDensity: VisualDensity.compact,
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                ),
-              ),
+            // if (isEditMode)
+            //   Padding(
+            //     padding: const EdgeInsets.only(left: 8.0),
+            //     child: IconButton(
+            //       onPressed: onTapUpdateName,
+            //       visualDensity: VisualDensity.compact,
+            //       icon: const Icon(Icons.edit, color: Colors.white),
+            //     ),
+            //   ),
             Padding(
               padding: const EdgeInsets.all(10),
               child: imagePath != null
