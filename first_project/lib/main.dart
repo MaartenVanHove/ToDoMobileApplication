@@ -21,10 +21,9 @@ class MyApp extends StatelessWidget {
         title: 'Todo List',
         theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF0A0F1F),
-          // Voeg dit gedeelte toe:
           appBarTheme: const AppBarTheme(
             backgroundColor: Color(0xFF0A0F1F),
-            iconTheme: IconThemeData(color: Colors.white), // Dit kleurt de back-arrow wit
+            iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),
           iconTheme: IconThemeData(color: Colors.white), 

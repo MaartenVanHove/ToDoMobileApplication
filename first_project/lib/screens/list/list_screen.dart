@@ -86,8 +86,6 @@ class _ListScreenState extends State<ListScreen> {
             if(isEditMode) _buildEditActions(appState),
             if(!isEditMode) 
               _buildInputField(appState),
-            // if(!isEditMode)
-            //   _buildAddButton(appState),
           ],
         ),
       ),
@@ -165,8 +163,16 @@ class _ListScreenState extends State<ListScreen> {
     });
   }
 
+  void _activateEditModeWithSelect(Task task) {
+    setState(() {
+      isEditMode = true;
+      selectedTaskIds.add(task.id);
+    });
+  }
+
   void _resetEditMode() {
     selectedTaskIds.clear();
+    isEditMode = false;
   }
 
   // ---------------- ADD TASK ----------------
@@ -302,10 +308,14 @@ class _ListScreenState extends State<ListScreen> {
   }
   
   void _addNewTask(MyAppState appState, String name) {
-    print("imagePath: ${_imageFile!.path}");
-    appState.addTask(widget.listId, name, _imageFile!.path);
+    final String? path = _imageFile?.path;
+
+    appState.addTask(widget.listId, name, path);
+  
     controller.clear();
-    _imageFile = null;
+    setState(() {
+      _imageFile = null;
+    });
   }
 
   // ---------------- TASKS ----------------
@@ -371,6 +381,9 @@ class _ListScreenState extends State<ListScreen> {
 
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName);
+                setState(() {
+                        _resetEditMode();
+                      });
               }
             },
             onTapInstantDelete: () {
@@ -380,6 +393,7 @@ class _ListScreenState extends State<ListScreen> {
                 appState.deleteTask(widget.listId, task.id);
               });
             },
+            onPressedEdit: () => _activateEditModeWithSelect(task),
             isEditMode: isEditMode,
             isSelected: selectedTaskIds.contains(task.id),
           ),
@@ -436,6 +450,9 @@ class _ListScreenState extends State<ListScreen> {
 
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName);
+                setState(() {
+                        _resetEditMode();
+                      });
               }
             },
              onTapInstantDelete: () {
@@ -445,6 +462,7 @@ class _ListScreenState extends State<ListScreen> {
                 appState.deleteTask(widget.listId, task.id);
               });
             },
+            onPressedEdit: () => _activateEditModeWithSelect(task),
             isEditMode: isEditMode,
             isSelected: selectedTaskIds.contains(task.id),
           ),
@@ -473,7 +491,6 @@ class _ListScreenState extends State<ListScreen> {
                       }
                       setState(() {
                         _resetEditMode();
-                        isEditMode = false;
                       });
                     },
               child: Text(
@@ -493,7 +510,6 @@ class _ListScreenState extends State<ListScreen> {
               onPressed: () {
                 setState(() {
                   _resetEditMode();
-                  isEditMode = false;
                 });
               },
               child: const Text(

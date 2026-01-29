@@ -154,7 +154,8 @@ class MyAppState extends ChangeNotifier {
         id: task.id,
         listId: task.listId,
         name: name,
-        isFinished: task.isFinished
+        isFinished: task.isFinished,
+        imagePath: task.imagePath
       );
       notifyListeners();
     }

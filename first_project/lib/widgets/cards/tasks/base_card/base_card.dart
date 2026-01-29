@@ -9,6 +9,7 @@ class BaseTaskCard extends StatelessWidget {
   final VoidCallback onTapSelect;
   final VoidCallback onTapUpdateName;
   final VoidCallback onTapInstantDelete;
+  final VoidCallback? onPressedEdit;
   final bool isEditMode;
   final bool isSelected;
   final bool showDragHandle;
@@ -24,6 +25,7 @@ class BaseTaskCard extends StatelessWidget {
     required this.onTapSelect,
     required this.onTapUpdateName,
     required this.onTapInstantDelete,
+    this.onPressedEdit,
     required this.isEditMode,
     required this.isSelected,
     required this.showDragHandle,
@@ -31,55 +33,110 @@ class BaseTaskCard extends StatelessWidget {
     required this.textStyle,
   });
 
-  // Methode om de grote weergave te tonen
-  void _showImagePreview(BuildContext context) {
+void _showImagePreview(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: const Color(0xFF162238),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // TITLE
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style: textStyle.copyWith(
-                  fontSize: 20, 
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.none, // Voorkom doorgestreepte tekst bij voltooide taken
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            
-            // BIG IMAGE
-            Flexible(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-                child: imagePath != null
-                    ? Image.file(
-                        File(imagePath!),
-                        width: double.infinity,
-                        fit: BoxFit.contain,
-                      )
-                    : Container(
-                        height: 200,
-                        width: double.infinity,
-                        color: Colors.black26,
-                        child: const Icon(Icons.image_not_supported, size: 50, color: Colors.white24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // The Scrollable Area
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. IMAGE SECTION WITH EDIT ICON
+                      Stack(
+                        children: [
+                          imagePath != null
+                              ? Image.file(
+                                  File(imagePath!),
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                )
+                              : Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Colors.black26,
+                                  child: const Icon(Icons.image_not_supported,
+                                      size: 50, color: Colors.white24),
+                                ),
+                          // Image Edit Button
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black54,
+                              child: IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                                onPressed: () {
+                                  // Add your image picking logic here
+                                  Navigator.pop(context);
+                                  // Example: _pickImage(ImageSource.gallery);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+
+                      // 2. TEXT SECTION WITH EDIT ICON
+                      Container(
+                        width: double.infinity,
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 30, 40, 20), // Added padding for the icon
+                              child: Text(
+                                title,
+                                style: textStyle.copyWith(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.none,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                            // Text Edit Button
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: IconButton(
+                                icon: const Icon(Icons.edit_note, color: Color(0xFF9BB3D1), size: 26),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            
-            // CLOSE BUTTONN
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Close", style: TextStyle(color: Color(0xFF9BB3D1))),
-            ),
-          ],
+
+              // 3. ACTION BUTTON
+              const Divider(color: Colors.white12, height: 1),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text("Close",
+                        style: TextStyle(color: Color(0xFF9BB3D1), fontSize: 16)),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -99,59 +156,52 @@ class BaseTaskCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        // Als we in EditMode zijn selecteren we, anders openen we de preview
-        onTap: isEditMode ? null : () => _showImagePreview(context),
+        // Verbetering: In Edit Mode selecteert de hele kaart. In normale mode opent hij de preview.
+        onTap: isEditMode 
+            ? onTapSelect 
+            : () => _showImagePreview(context),
+        onLongPress: isEditMode == false
+         ? onPressedEdit
+         : null,
         child: Row(
           children: [
-            // IMAGE THUMBNAIL
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  color: Colors.black26,
-                  child: imagePath != null
-                      ? Image.file(
-                          File(imagePath!),
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(
-                          Icons.image_outlined,
-                          color: Color(0xFF9BB3D1),
-                          size: 28,
-                        ),
+            // 1. LEFT ACTIONS
+            if (isEditMode)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: onTapUpdateName,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
+            // 2. IMAGE THUMBNAIL
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: imagePath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                          width: 56,
+                          height: 56,
+                          color: Colors.black26,
+                          child: Image.file(
+                            File(imagePath!),
+                            fit: BoxFit.cover,
+                          )),
+                    )
+                  : const SizedBox(width: 0, height: 56), // Placeholder om alignment gelijk te houden
             ),
 
-            // LEFT ACTIONS (EDIT MODE)
-            if (isEditMode)
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: onTapSelect,
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: onTapUpdateName,
-                    visualDensity: VisualDensity.compact,
-                    icon: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-
-            // TITLE
+            // 3. TITLE
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -164,7 +214,7 @@ class BaseTaskCard extends StatelessWidget {
               ),
             ),
 
-            // ☰ DRAG HANDLE (Alleen zichtbaar in normale modus)
+            // 4. DRAG HANDLE (Rechts)
             if (showDragHandle && !isEditMode)
               ReorderableDragStartListener(
                 index: index,
@@ -178,7 +228,7 @@ class BaseTaskCard extends StatelessWidget {
                 ),
               ),
 
-            // 🗑 DELETE (EDIT MODE)
+            // 5. DELETE (Rechts, alleen in Edit Mode)
             if (isEditMode)
               IconButton(
                 onPressed: onTapInstantDelete,
