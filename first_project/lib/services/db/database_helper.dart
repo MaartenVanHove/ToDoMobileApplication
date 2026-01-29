@@ -181,6 +181,16 @@ class DatabaseServices {
     );
   }
 
+  Future<void> updateTaskImage(int id, String? imagePath) async {
+    final db = await database;
+    await db.update(
+      'tasks', 
+      {'image_path': imagePath},
+      where: 'id = ?',
+      whereArgs: [id]
+    );
+  }
+
   Future<void> deleteCollection(int id) async {
     final db = await database;
     await db.delete(

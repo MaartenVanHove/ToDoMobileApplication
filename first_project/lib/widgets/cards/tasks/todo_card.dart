@@ -8,6 +8,7 @@ class TodoCard extends StatelessWidget {
   final VoidCallback onTapSelect;
   final VoidCallback onTapUpdateName;
   final VoidCallback onTapInstantDelete;
+  final Function(String?) updateImagePath;
   final VoidCallback? onPressedEdit;
   final bool isEditMode;
   final bool isSelected;
@@ -20,6 +21,7 @@ class TodoCard extends StatelessWidget {
     required this.onTapSelect,
     required this.onTapUpdateName,
     required this.onTapInstantDelete,
+    required this.updateImagePath,
     this.onPressedEdit,
     required this.isEditMode,
     required this.isSelected,
@@ -34,6 +36,7 @@ class TodoCard extends StatelessWidget {
       onTapSelect: onTapSelect,
       onTapUpdateName: onTapUpdateName,
       onTapInstantDelete: onTapInstantDelete,
+      onImageChanged: updateImagePath,
       onPressedEdit: onPressedEdit,
       isEditMode: isEditMode,
       isSelected: isSelected,

@@ -202,4 +202,20 @@ class MyAppState extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void updateImage(Task task, String? imagePath) {
+    db.updateTaskImage(task.id, imagePath);
+    final list = tasks[task.listId]!;
+    final index = list.indexWhere((t) => t.id == task.id);
+    if(index != -1) {
+      list[index] = Task(
+        id: task.id,
+        listId: task.listId,
+        name: task.name,
+        isFinished: task.isFinished,
+        imagePath: imagePath
+      );
+      notifyListeners();
+    }
+  }
 }

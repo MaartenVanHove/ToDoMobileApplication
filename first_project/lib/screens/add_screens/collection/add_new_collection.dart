@@ -74,7 +74,7 @@ class AddNewCollectionScreen extends StatelessWidget {
           ),
         ),
         child: const Text(
-          "Next",
+          "Create",
           style: TextStyle(
             fontSize: 16,
             color: Colors.white,

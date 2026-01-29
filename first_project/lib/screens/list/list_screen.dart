@@ -393,6 +393,9 @@ class _ListScreenState extends State<ListScreen> {
                 appState.deleteTask(widget.listId, task.id);
               });
             },
+            updateImagePath: (newPath) {
+              appState.updateImage(task, newPath);
+            },
             onPressedEdit: () => _activateEditModeWithSelect(task),
             isEditMode: isEditMode,
             isSelected: selectedTaskIds.contains(task.id),
@@ -461,6 +464,9 @@ class _ListScreenState extends State<ListScreen> {
               setState(() {
                 appState.deleteTask(widget.listId, task.id);
               });
+            },
+            onImageChanged: (newPath) {
+              appState.updateImage(task, newPath);
             },
             onPressedEdit: () => _activateEditModeWithSelect(task),
             isEditMode: isEditMode,
