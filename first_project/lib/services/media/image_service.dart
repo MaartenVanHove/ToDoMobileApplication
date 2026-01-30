@@ -14,6 +14,7 @@ class ImageService {
       );
 
       if (pickedFile != null) {
+        print("Image path: ${pickedFile.path}");
         return File(pickedFile.path);
       }
     } catch (e) {

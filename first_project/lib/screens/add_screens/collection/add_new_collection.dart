@@ -1,4 +1,3 @@
-// lib/screens/add_screens/list/add_new_list_screen.dart
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/screens/collections/collection_screen.dart';
 import 'package:flutter/material.dart';

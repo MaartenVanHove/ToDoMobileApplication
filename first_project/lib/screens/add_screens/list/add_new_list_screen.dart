@@ -1,6 +1,9 @@
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'dart:io';
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/screens/list/list_screen.dart';
+import 'package:first_project/services/media/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -19,30 +22,9 @@ class AddNewListScreen extends StatefulWidget {
 
 class _AddNewListScreenState extends State<AddNewListScreen> {
   final TextEditingController controller = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
   File? _imageFile;
 
   // ---------------- IMAGE LOGIC ----------------
-
-  // The logic that takes place to pick a image:
-  Future<void> _pickImage(ImageSource source) async {
-    try {      
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        maxWidth: 1000,
-        imageQuality: 85,
-      );
-      
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
-        debugPrint("Picked path: ${pickedFile.path}");
-      }
-    } catch (error) {
-      debugPrint("Error. Unable picking image: $error");
-    }
-  }
 
   void _showPickerOptions(BuildContext context) {
     showModalBottomSheet(
@@ -58,17 +40,19 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.white),
                 title: const Text('Photo Gallery', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  _pickImage(ImageSource.gallery);
+                onTap: () async {
+                  _imageFile = await ImageService.pickImage(ImageSource.gallery);
                   Navigator.pop(context);
+                  setState(() {});
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: Colors.white),
                 title: const Text('Camera', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  _pickImage(ImageSource.camera);
+                onTap: () async {
+                  _imageFile = await ImageService.pickImage(ImageSource.camera);
                   Navigator.pop(context);
+                  setState(() {});
                 },
               ),
               if (_imageFile != null)
@@ -191,9 +175,36 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     final input = controller.text.trim();
     if (input.isEmpty) return;
 
-    // Passing the file path to your appState
+    String? finalImagePath;
+
+    // --- START VEILIG OPSLAAN LOGICA ---
+    if (_imageFile != null) {
+      try {
+        // 1. Zoek de permanente Documents map
+        final directory = await getApplicationDocumentsDirectory();
+        
+        // 2. Maak een unieke bestandsnaam voor de lijst-cover
+        final String fileName = "list_cover_${DateTime.now().millisecondsSinceEpoch}${p.extension(_imageFile!.path)}";
+        final String newPath = p.join(directory.path, fileName);
+
+        // 3. Kopieer het bestand fysiek naar de veilige map
+        final File savedImage = await _imageFile!.copy(newPath);
+        finalImagePath = savedImage.path;
+        
+        debugPrint("List cover veilig opgeslagen: $finalImagePath");
+      } catch (e) {
+        debugPrint("Fout bij opslaan list cover: $e");
+        // Optioneel: als kopiëren faalt, val terug op het tijdelijke pad
+        finalImagePath = _imageFile?.path;
+      }
+    }
+    // --- EINDE VEILIG OPSLAAN LOGICA ---
+
+    // Gebruik nu 'finalImagePath' in plaats van '_imageFile?.path'
     final newListId = await appState.createList(
-      input, widget.collectionId, _imageFile?.path
+      input, 
+      widget.collectionId, 
+      finalImagePath
     );
 
     if (mounted) {

@@ -1,4 +1,7 @@
-// lib/screens/list/todo_screen.dart
+import 'package:first_project/services/media/image_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+
 import 'dart:io';
 
 import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
@@ -28,7 +31,6 @@ class ListScreen extends StatefulWidget {
 class _ListScreenState extends State<ListScreen> {
   final TextEditingController controller = TextEditingController();
 
-  final ImagePicker _picker = ImagePicker();
   File? _imageFile;
 
   bool isEditMode = false;
@@ -177,26 +179,6 @@ class _ListScreenState extends State<ListScreen> {
 
   // ---------------- ADD TASK ----------------
 
-  // The logic that takes place to pick a image:
-  Future<void> _pickImage(ImageSource source) async {
-    try {      
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        maxWidth: 1000,
-        imageQuality: 85,
-      );
-      
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
-        debugPrint("Picked path: ${pickedFile.path}");
-      }
-    } catch (error) {
-      debugPrint("Error. Unable picking image: $error");
-    }
-  }
-
   Widget _buildInputField(MyAppState appState) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -262,12 +244,12 @@ class _ListScreenState extends State<ListScreen> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
-                            onPressed: () => _pickImage(ImageSource.gallery),
+                            onPressed: () async => _imageFile = await ImageService.pickImage(ImageSource.gallery),
                           ),
                           if (controller.text.isEmpty)
                             IconButton(
                               icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
-                              onPressed: () => _pickImage(ImageSource.camera),
+                              onPressed: () async => _imageFile = await ImageService.pickImage(ImageSource.camera),
                             ),
                         ],
                       ),
@@ -299,7 +281,7 @@ class _ListScreenState extends State<ListScreen> {
         onPressed: () {
           final name = controller.text.trim();
           if (name.isNotEmpty) {
-            _addNewTask(appState, name);
+            _saveNewTask(appState, name);
             setState(() {}); // Refreshes to show camera/mic again
           }
         },
@@ -307,11 +289,27 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
   
-  void _addNewTask(MyAppState appState, String name) {
-    final String? path = _imageFile?.path;
+  void _saveNewTask(MyAppState appState, String name) async {
+    String? savedPath;
 
-    appState.addTask(widget.listId, name, path);
-  
+    if (_imageFile != null) {
+      try {
+        final directory = await getApplicationDocumentsDirectory();
+        
+        final String fileName = "task_${DateTime.now().millisecondsSinceEpoch}${p.extension(_imageFile!.path)}";
+        final String newPath = p.join(directory.path, fileName);
+
+        final File savedImage = await _imageFile!.copy(newPath);
+        savedPath = savedImage.path;
+        
+        debugPrint("Image saved: $savedPath");
+      } catch (e) {
+        debugPrint("Error saving image: $e");
+      }
+    }
+
+    appState.addTask(widget.listId, name, savedPath);
+
     controller.clear();
     setState(() {
       _imageFile = null;
