@@ -1,4 +1,6 @@
-import 'package:first_project/screens/list/widgets/edit_action_bar.dart';
+import 'package:first_project/screens/list/widgets/list_tool_bar.dart';
+import 'package:first_project/screens/list/widgets/task_completedlist_section.dart';
+import 'package:first_project/screens/list/widgets/task_input_field.dart';
 import 'package:first_project/screens/list/widgets/task_todolist_section.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,9 +14,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:first_project/providers/app_state.dart';
-import 'package:first_project/models/task.dart';
-import 'package:first_project/widgets/cards/tasks/todo_card.dart';
-import 'package:first_project/widgets/cards/tasks/completed_card.dart';
 
 import 'package:first_project/screens/list/list_controller.dart';
 
@@ -73,7 +72,7 @@ class _ListScreenState extends State<ListScreen> {
           child: Column(
             children: [
               if(todoTasks.isNotEmpty || finishedTasks.isNotEmpty)
-                EditActionBar(),
+                ListToolBar(),
               // SCROLLABLE CONTENT
               Expanded(
                 child: SingleChildScrollView(
@@ -89,7 +88,7 @@ class _ListScreenState extends State<ListScreen> {
                         ),
 
                       TaskListView(tasks: todoTasks, listId: widget.listId),
-                      _buildFinishedTasks(appState, finishedTasks),
+                      TaskCompletedListView(tasks: finishedTasks, listId: widget.listId),
                     ],
                   ),
                 ),
@@ -97,7 +96,7 @@ class _ListScreenState extends State<ListScreen> {
 
               if(isEditMode) _buildEditActions(appState),
               if(!isEditMode) 
-                _buildInputField(appState),
+                TaskInputField(listId: widget.listId),
             ],
           ),
         ),
@@ -141,230 +140,10 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
-  void _activateEditModeWithSelect(Task task) {
-    setState(() {
-      isEditMode = true;
-      selectedTaskIds.add(task.id);
-    });
-  }
-
   void _resetEditMode() {
     selectedTaskIds.clear();
     isEditMode = false;
   }
-
-  // ---------------- ADD TASK ----------------
-
-  Widget _buildInputField(MyAppState appState) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0F1F),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,       
-        children: [
-          if(_imageFile != null) 
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Stack(
-              alignment: Alignment.topRight,
-              children: [
-                Container(
-                  height: 120,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    image: DecorationImage(
-                      image: FileImage(_imageFile!),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                // "Remove" button
-                GestureDetector(
-                  onTap: () => setState(() => _imageFile = null),
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.close, color: Colors.white, size: 20),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // The Input Bubble
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF162238),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    style: const TextStyle(color: Colors.white),
-                    onChanged: (text) => setState(() {}),
-                    decoration: InputDecoration(
-                      hintText: 'Enter new Task...',
-                      hintStyle: const TextStyle(color: Color(0xFF9BB3D1)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      border: InputBorder.none, // Removes the standard line
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
-                            onPressed: () async => _imageFile = await ImageService.pickImage(ImageSource.gallery),
-                          ),
-                          if (controller.text.isEmpty)
-                            IconButton(
-                              icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
-                              onPressed: () async => _imageFile = await ImageService.pickImage(ImageSource.camera),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // The Circular Send Button
-              _buildAddButton(appState),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddButton(MyAppState appState) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF6290EB),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(
-          Icons.add, // WhatsApp style switch
-          color: Colors.white,
-        ),
-        onPressed: () {
-          final name = controller.text.trim();
-          if (name.isNotEmpty) {
-            _saveNewTask(appState, name);
-            setState(() {}); // Refreshes to show camera/mic again
-          }
-        },
-      ),
-    );
-  }
-  
-  void _saveNewTask(MyAppState appState, String name) async {
-    String? savedPath;
-
-    if (_imageFile != null) {
-      try {
-        final directory = await getApplicationDocumentsDirectory();
-        
-        final String fileName = "task_${DateTime.now().millisecondsSinceEpoch}${p.extension(_imageFile!.path)}";
-        final String newPath = p.join(directory.path, fileName);
-
-        final File savedImage = await _imageFile!.copy(newPath);
-        savedPath = savedImage.path;
-        
-        debugPrint("Image saved: $savedPath");
-      } catch (e) {
-        debugPrint("Error saving image: $e");
-      }
-    }
-
-    appState.addTask(widget.listId, name, savedPath);
-
-    controller.clear();
-    setState(() {
-      _imageFile = null;
-    });
-  }
-
-  // ---------------- FINISHED TASKS ----------------
-
-  Widget _buildFinishedTasks(MyAppState appState, List<Task> tasks) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-
-        return Dismissible(
-          key: ValueKey(task.id),
-          direction: DismissDirection.startToEnd,
-          background: Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 20),
-            color: const Color.fromARGB(255, 76, 78, 175),
-            child: const Icon(Icons.undo, color: Colors.white),
-          ),
-          onDismissed: (_) => appState.toggleTaskFinished(task),
-          child: FinishedCard(
-            cardName: task.name,
-            imagePath: task.imagePath != null 
-              ? task.imagePath
-              : null,
-            index: index,
-            onTapSelect: () {
-              if(!isEditMode) return;
-
-              setState(() {
-                if (selectedTaskIds.contains(task.id)) {
-                  selectedTaskIds.remove(task.id);
-                } else {
-                  selectedTaskIds.add(task.id);
-                }
-              });
-            },
-            onTapUpdateName: () async {
-              final newName = await showDialog<String>(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => ChangeNameDialog(
-                  title: "Change '${task.name}' name",
-                ),
-              );
-
-              if (newName != null && newName.trim().isNotEmpty) {
-                appState.updateTaskName(task, newName);
-                setState(() {
-                        _resetEditMode();
-                      });
-              }
-            },
-             onTapInstantDelete: () {
-              if(!isEditMode) return;
-
-              setState(() {
-                appState.deleteTask(widget.listId, task.id);
-              });
-            },
-            onImageChanged: (newPath) {
-              appState.updateImage(task, newPath);
-            },
-            onPressedEdit: () => _activateEditModeWithSelect(task),
-            isEditMode: isEditMode,
-            isSelected: selectedTaskIds.contains(task.id),
-          ),
-        );
-      },
-    );
-  }
-
-  // ---------------- FINISHED TASKS ----------------
 
   Widget _buildEditActions(MyAppState appState) {
     return Container(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:first_project/screens/list/list_controller.dart';
 import 'package:provider/provider.dart';
 
-class EditActionBar extends StatelessWidget {
+class ListToolBar extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {

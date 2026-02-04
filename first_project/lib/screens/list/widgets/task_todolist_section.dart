@@ -1,4 +1,3 @@
-
 import 'package:first_project/models/task.dart';
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/screens/list/list_controller.dart';
