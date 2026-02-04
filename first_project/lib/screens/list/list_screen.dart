@@ -1,4 +1,5 @@
 import 'package:first_project/screens/list/widgets/edit_action_bar.dart';
+import 'package:first_project/screens/list/widgets/task_todolist_section.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -87,7 +88,7 @@ class _ListScreenState extends State<ListScreen> {
                           ),
                         ),
 
-                      _buildTodoTasks(appState, todoTasks),
+                      TaskListView(tasks: todoTasks, listId: widget.listId),
                       _buildFinishedTasks(appState, finishedTasks),
                     ],
                   ),
@@ -123,7 +124,7 @@ class _ListScreenState extends State<ListScreen> {
             final newName = await showDialog<String>(
               context: context,
               barrierDismissible: false,
-              builder: (_) => ChangeNameDialog.ChangeNameDialog(
+              builder: (_) => ChangeNameDialog(
                 title: "Change '$title' title",
               ),
             );
@@ -291,93 +292,6 @@ class _ListScreenState extends State<ListScreen> {
     });
   }
 
-  // ---------------- TASKS ----------------
-
-  Widget _buildTodoTasks(MyAppState appState, List<Task> tasks) {
-    return ReorderableListView.builder(
-      buildDefaultDragHandles: false,
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if(oldIndex < newIndex) {
-            newIndex -= 1;
-          }
-
-          final movedTask = tasks.removeAt(oldIndex);
-          tasks.insert(newIndex, movedTask);
-
-          appState.updateTaskOrder(widget.listId, tasks);
-        });
-      },
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        
-        return Dismissible(
-          key: ValueKey(task.id),
-          direction: isEditMode
-            ? DismissDirection.none
-            : DismissDirection.endToStart,
-          background: Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            color: const Color.fromARGB(255, 60, 244, 54),
-            child: const Icon(Icons.check, color: Colors.white),
-          ),
-          onDismissed: (_) => appState.toggleTaskFinished(task),
-          child: TodoCard(
-            cardName: task.name,
-            imagePath: task.imagePath != null 
-              ? task.imagePath
-              : null,
-            index: index,
-            onTapSelect: () {
-              if(!isEditMode) return;
-
-              setState(() {
-                if (selectedTaskIds.contains(task.id)) {
-                  selectedTaskIds.remove(task.id);
-                } else {
-                  selectedTaskIds.add(task.id);
-                }
-              });
-            },
-            onTapUpdateName: () async {
-              final newName = await showDialog<String>(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => ChangeNameDialog.ChangeNameDialog(
-                  title: "Change '${task.name}' name",
-                ),
-              );
-
-              if (newName != null && newName.trim().isNotEmpty) {
-                appState.updateTaskName(task, newName);
-                setState(() {
-                        _resetEditMode();
-                      });
-              }
-            },
-            onTapInstantDelete: () {
-              if(!isEditMode) return;
-
-              setState(() {
-                appState.deleteTask(widget.listId, task.id);
-              });
-            },
-            updateImagePath: (newPath) {
-              appState.updateImage(task, newPath);
-            },
-            onPressedEdit: () => _activateEditModeWithSelect(task),
-            isEditMode: isEditMode,
-            isSelected: selectedTaskIds.contains(task.id),
-          ),
-        );
-      },
-    );
-  }
-
   // ---------------- FINISHED TASKS ----------------
 
   Widget _buildFinishedTasks(MyAppState appState, List<Task> tasks) {
@@ -419,7 +333,7 @@ class _ListScreenState extends State<ListScreen> {
               final newName = await showDialog<String>(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => ChangeNameDialog.ChangeNameDialog(
+                builder: (_) => ChangeNameDialog(
                   title: "Change '${task.name}' name",
                 ),
               );

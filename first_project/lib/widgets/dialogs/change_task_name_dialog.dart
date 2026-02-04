@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChangeNameDialog extends StatelessWidget {
   final String title;
 
-  ChangeNameDialog.ChangeNameDialog({
+  ChangeNameDialog({
     super.key,
     required this.title,
   });

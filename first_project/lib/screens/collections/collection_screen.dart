@@ -53,7 +53,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                               final newName = await showDialog<String>(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (_) => ChangeNameDialog.ChangeNameDialog(
+                                builder: (_) => ChangeNameDialog(
                                   title: "Change '${collection.name}' title",
                                 ),
                               );

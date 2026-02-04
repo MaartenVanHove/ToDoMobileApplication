@@ -48,6 +48,15 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleSelection(int taskId) {
+    if (selectedTaskIds.contains(taskId)) {
+      selectedTaskIds.remove(taskId);
+    } else {
+      selectedTaskIds.add(taskId);
+    }
+    notifyListeners(); // This is the new "setState"
+  }
+
   // --- Database Actions ---
   Future<void> saveTask(MyAppState appState, int listId) async {
     final name = textController.text.trim();

@@ -6,7 +6,7 @@ class EditActionBar extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final controller =context.watch<ListController>();
+    final controller = context.watch<ListController>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
