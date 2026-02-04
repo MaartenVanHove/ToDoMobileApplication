@@ -1,3 +1,4 @@
+import 'package:first_project/screens/list/widgets/edit_action_bar.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -13,6 +14,8 @@ import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/models/task.dart';
 import 'package:first_project/widgets/cards/tasks/todo_card.dart';
 import 'package:first_project/widgets/cards/tasks/completed_card.dart';
+
+import 'package:first_project/screens/list/list_controller.dart';
 
 class ListScreen extends StatefulWidget {
   final int listId;
@@ -57,38 +60,45 @@ class _ListScreenState extends State<ListScreen> {
 
     final list = appState.getListById(widget.listId);
 
-    return Scaffold(
-      appBar: _buildTitle(list?.name ?? '', appState),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if(todoTasks.isNotEmpty || finishedTasks.isNotEmpty)
-              _buildEditIcon(),
-            // SCROLLABLE CONTENT
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    if (todoTasks.isEmpty && finishedTasks.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Text(
-                          "No cards yet! 🎉",
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                      ),
 
-                    _buildTodoTasks(appState, todoTasks),
-                    _buildFinishedTasks(appState, finishedTasks),
-                  ],
+
+    return ChangeNotifierProvider(
+      create: (_) => ListController(),
+    // 2. The 'builder' or 'child' ensures that everything below (like EditActionBar) 
+    // can find the controller.
+      child: Scaffold(
+        appBar: _buildTitle(list?.name ?? '', appState),
+        body: SafeArea(
+          child: Column(
+            children: [
+              if(todoTasks.isNotEmpty || finishedTasks.isNotEmpty)
+                EditActionBar(),
+              // SCROLLABLE CONTENT
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      if (todoTasks.isEmpty && finishedTasks.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            "No cards yet! 🎉",
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        ),
+
+                      _buildTodoTasks(appState, todoTasks),
+                      _buildFinishedTasks(appState, finishedTasks),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            if(isEditMode) _buildEditActions(appState),
-            if(!isEditMode) 
-              _buildInputField(appState),
-          ],
+              if(isEditMode) _buildEditActions(appState),
+              if(!isEditMode) 
+                _buildInputField(appState),
+            ],
+          ),
         ),
       ),
     );
@@ -128,41 +138,6 @@ class _ListScreenState extends State<ListScreen> {
         ),
       ],
     );
-  }
-
-
-  Widget _buildEditIcon() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const SizedBox(width: 8),
-        TextButton.icon(
-          icon: Icon(
-            Icons.edit, 
-            color: isEditMode ? Colors.white : Color(0xFF9BB3D1), 
-            size: 24
-          ),
-          label: Text(
-            "EDIT",
-            style: TextStyle(
-              color: isEditMode ? Colors.white : Color(0xFF9BB3D1),
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          onPressed: () {
-            _toggleEditMode();
-          },
-        ),
-      ],
-    );
-  }
-
-  void _toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-      if(!isEditMode) _resetEditMode();
-    });
   }
 
   void _activateEditModeWithSelect(Task task) {
