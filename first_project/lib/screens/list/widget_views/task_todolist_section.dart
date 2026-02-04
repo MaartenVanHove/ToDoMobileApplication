@@ -18,7 +18,7 @@ class TaskListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ListController>();
+    final listController = context.watch<ListController>();
     final appState = context.read<MyAppState>();
 
     return ReorderableListView.builder(
@@ -38,7 +38,7 @@ class TaskListView extends StatelessWidget {
 
         return Dismissible(
           key: ValueKey(task.id),
-          direction: controller.isEditMode ? DismissDirection.none : DismissDirection.endToStart,
+          direction: listController.isEditMode ? DismissDirection.none : DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
@@ -50,12 +50,12 @@ class TaskListView extends StatelessWidget {
             cardName: task.name,
             imagePath: task.imagePath,
             index: index,
-            isEditMode: controller.isEditMode,
-            isSelected: controller.selectedTaskIds.contains(task.id),
+            isEditMode: listController.isEditMode,
+            isSelected: listController.selectedTaskIds.contains(task.id),
             
-            onTapSelect: () => controller.toggleSelection(task.id),
+            onTapSelect: () => listController.toggleSelection(task.id),
             
-            onPressedEdit: () => controller.activateEditWithTask(task.id),
+            onPressedEdit: () => listController.activateEditWithTask(task.id),
             
             onTapUpdateName: () async {
               final newName = await showDialog<String>(
@@ -64,7 +64,7 @@ class TaskListView extends StatelessWidget {
               );
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName.trim());
-                controller.toggleEditMode(); // Closes edit mode after change
+                listController.toggleEditMode(); // Closes edit mode after change
               }
             },
             

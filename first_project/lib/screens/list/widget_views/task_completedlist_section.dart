@@ -18,7 +18,7 @@ class TaskCompletedListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ListController>();
+    final listController = context.watch<ListController>();
     final appState = context.read<MyAppState>();
 
     return ListView.builder(
@@ -42,15 +42,15 @@ class TaskCompletedListView extends StatelessWidget {
             cardName: task.name,
             imagePath: task.imagePath,
             index: index,
-            isEditMode: controller.isEditMode,
-            isSelected: controller.selectedTaskIds.contains(task.id),
+            isEditMode: listController.isEditMode,
+            isSelected: listController.selectedTaskIds.contains(task.id),
             
             // --- UI State Actions (via Controller) ---
             onTapSelect: () {
-              if (!controller.isEditMode) return;
-              controller.toggleSelection(task.id);
+              if (!listController.isEditMode) return;
+              listController.toggleSelection(task.id);
             },
-            onPressedEdit: () => controller.activateEditWithTask(task.id),
+            onPressedEdit: () => listController.activateEditWithTask(task.id),
 
             // --- Data Actions (via AppState) ---
             onTapUpdateName: () async {
@@ -64,11 +64,11 @@ class TaskCompletedListView extends StatelessWidget {
 
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName.trim());
-                controller.toggleEditMode(); // Resets UI mode
+                listController.toggleEditMode(); // Resets UI mode
               }
             },
             onTapInstantDelete: () {
-              if (!controller.isEditMode) return;
+              if (!listController.isEditMode) return;
               appState.deleteTask(listId, task.id);
             },
             onImageChanged: (newPath) {

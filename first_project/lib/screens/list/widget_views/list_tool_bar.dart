@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 class ListToolBar extends StatelessWidget {
   
+  //TODO: add new functionalities like: searchbar & filter system.
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ListController>();

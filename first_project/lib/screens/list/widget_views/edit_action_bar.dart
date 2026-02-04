@@ -10,12 +10,10 @@ class EditActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We watch the controller to know how many items are selected
-    final controller = context.watch<ListController>();
-    // We read appState to trigger the delete actions
+    final listController = context.watch<ListController>();
     final appState = context.read<MyAppState>();
 
-    final bool hasSelection = controller.selectedTaskIds.isNotEmpty;
+    final bool hasSelection = listController.selectedTaskIds.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -35,14 +33,14 @@ class EditActionBar extends StatelessWidget {
                   ? null
                   : () {
                       // Perform the bulk delete
-                      for (final id in controller.selectedTaskIds) {
+                      for (final id in listController.selectedTaskIds) {
                         appState.deleteTask(listId, id);
                       }
                       // Tell controller to turn off edit mode and clear IDs
-                      controller.toggleEditMode(); 
+                      listController.toggleEditMode(); 
                     },
               child: Text(
-                "Delete ${controller.selectedTaskIds.length}",
+                "Delete ${listController.selectedTaskIds.length}",
                 style: TextStyle(
                   color: hasSelection ? Colors.white : const Color(0xFF9BB3D1),
                 ),
@@ -60,7 +58,7 @@ class EditActionBar extends StatelessWidget {
               ),
               onPressed: () {
                 // Just turn off edit mode
-                controller.toggleEditMode();
+                listController.toggleEditMode();
               },
               child: const Text(
                 "Cancel",

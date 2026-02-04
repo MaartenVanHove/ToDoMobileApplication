@@ -11,7 +11,7 @@ class TaskInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ListController>();
+    final listController = context.watch<ListController>();
     final appState = context.read<MyAppState>();
 
     return Container(
@@ -21,7 +21,7 @@ class TaskInputField extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // 1. Image Preview Section
-          if (controller.imageFile != null)
+          if (listController.imageFile != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Stack(
@@ -33,13 +33,13 @@ class TaskInputField extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       image: DecorationImage(
-                        image: FileImage(controller.imageFile!),
+                        image: FileImage(listController.imageFile!),
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => controller.clearImage(), // logic moved to controller
+                    onTap: () => listController.clearImage(), // logic moved to controller
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
@@ -64,7 +64,7 @@ class TaskInputField extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
-                    controller: controller.textController, // Use controller's text editor
+                    controller: listController.textController, // Use controller's text editor
                     style: const TextStyle(color: Colors.white),
                     // No need for setState on onChanged; Provider handles the rebuild
                     decoration: InputDecoration(
@@ -77,13 +77,13 @@ class TaskInputField extends StatelessWidget {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
-                            onPressed: () => controller.pickImage(ImageSource.gallery),
+                            onPressed: () => listController.pickImage(ImageSource.gallery),
                           ),
                           // Only show camera if text is empty (WhatsApp style)
-                          if (controller.textController.text.isEmpty)
+                          if (listController.textController.text.isEmpty)
                             IconButton(
                               icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
-                              onPressed: () => controller.pickImage(ImageSource.camera),
+                              onPressed: () => listController.pickImage(ImageSource.camera),
                             ),
                         ],
                       ),
@@ -93,7 +93,7 @@ class TaskInputField extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               // 3. Add Button
-              _buildAddButton(context, controller, appState),
+              _buildAddButton(context, listController, appState),
             ],
           ),
         ],
