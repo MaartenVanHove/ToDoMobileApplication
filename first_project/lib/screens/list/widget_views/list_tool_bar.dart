@@ -8,7 +8,7 @@ class ListToolBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ListController>();
+    final listController = context.watch<ListController>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -17,19 +17,19 @@ class ListToolBar extends StatelessWidget {
         TextButton.icon(
           icon: Icon(
             Icons.edit, 
-            color: controller.isEditMode ? Colors.white : Color(0xFF9BB3D1), 
+            color: listController.isEditMode ? Colors.white : Color(0xFF9BB3D1), 
             size: 24
           ),
           label: Text(
             "EDIT",
             style: TextStyle(
-              color: controller.isEditMode ? Colors.white : Color(0xFF9BB3D1),
+              color: listController.isEditMode ? Colors.white : Color(0xFF9BB3D1),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
           onPressed: () {
-            controller.toggleEditMode();
+            listController.toggleEditMode();
           },
         ),
       ],

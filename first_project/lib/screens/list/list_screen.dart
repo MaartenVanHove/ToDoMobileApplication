@@ -1,3 +1,4 @@
+import 'package:first_project/core/constants/app_strings.dart';
 import 'package:first_project/screens/list/widget_views/edit_action_bar.dart';
 import 'package:first_project/screens/list/widget_views/list_tool_bar.dart';
 import 'package:first_project/screens/list/widget_views/task_completedlist_section.dart';
@@ -80,10 +81,10 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Widget _buildEmptyList() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.all(20),
       child: Text(
-        "No cards yet! 🎉",
+        AppStrings.get('list_screen', 'empty_state'),
         style: TextStyle(fontSize: 18, color: Colors.grey),
       ),
     );

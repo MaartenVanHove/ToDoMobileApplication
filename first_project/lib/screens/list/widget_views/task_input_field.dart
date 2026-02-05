@@ -16,7 +16,7 @@ class TaskInputField extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      color: const Color(0xFF0A0F1F),
+      // color: const Color(0xFF0A0F1F),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
