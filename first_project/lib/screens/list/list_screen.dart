@@ -70,7 +70,9 @@ class _ListScreenState extends State<ListScreen> {
 
                   listController.isEditMode 
                       ? EditActionBar(listId: widget.listId)
-                      : TaskInputField(listId: widget.listId),
+                      : listController.isEditingTitle
+                          ? const SizedBox.shrink()
+                          : TaskInputField(listId: widget.listId),
                 ],
               ),
             ),

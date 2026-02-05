@@ -217,4 +217,14 @@ class DatabaseServices {
       whereArgs: [id],
     );
   }
+
+  Future<void> updateListImage(int id, String? imagePath) async {
+    final db = await database;
+    await db.update(
+      'todo_lists', 
+      {'image_path': imagePath},
+      where: 'id = ?',
+      whereArgs: [id]
+    );
+  }
 }

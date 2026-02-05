@@ -10,12 +10,16 @@ class AddListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicWidth = screenWidth * 0.44; 
+    final dynamicHeight = dynamicWidth * 0.9; 
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: 200,
-        height: 180,
+        width: dynamicWidth,
+        height: dynamicHeight,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: const Color(0xFF18243A), // lighter than real cards

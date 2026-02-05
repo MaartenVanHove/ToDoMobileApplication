@@ -203,7 +203,7 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateImage(Task task, String? imagePath) {
+  void updateTaskImage(Task task, String? imagePath) {
     db.updateTaskImage(task.id, imagePath);
     final list = tasks[task.listId]!;
     final index = list.indexWhere((t) => t.id == task.id);
@@ -214,6 +214,21 @@ class MyAppState extends ChangeNotifier {
         name: task.name,
         isFinished: task.isFinished,
         imagePath: imagePath
+      );
+      notifyListeners();
+    }
+  }
+
+  void updateListImage(TodoList list, String? imagePath) {
+    // TODO: add backend function to update list image.
+    final collection = lists[list.collectionId]!;
+    final index = collection.indexWhere((l) => l.id == list.id);
+    if(index != -1) {
+      collection[index] = TodoList(
+        id: list.id, 
+        collectionId: list.collectionId,
+        name: list.name,
+        imagePath: imagePath,
       );
       notifyListeners();
     }

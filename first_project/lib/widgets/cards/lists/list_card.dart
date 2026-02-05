@@ -19,13 +19,17 @@ class ListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicWidth = screenWidth * 0.44; 
+    final dynamicHeight = dynamicWidth * 0.9; 
+
     return InkWell(
       onTap: onTap,
       onLongPress: onPressed,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: 200,
-        height: 180,
+        width: dynamicWidth,
+        height: dynamicHeight,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: const Color(0xFF1E2F4D),
@@ -81,16 +85,6 @@ class ListCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            // 🖼️ ICON PLACEHOLDER (Only if no image exists)
-            if (imagePath == null)
-              const Center(
-                child: Icon(
-                  Icons.image_outlined,
-                  size: 40,
-                  color: Color(0xFF9BB3D1),
-                ),
-              ),
           ],
         ),
       ),

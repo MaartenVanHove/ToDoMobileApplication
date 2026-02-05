@@ -10,9 +10,34 @@ class ListController extends ChangeNotifier {
   final TextEditingController textController = TextEditingController();
   File? imageFile;
   bool isEditMode = false;
+  bool isEditingTitle = false;
+  late TextEditingController titleEditController;
   final Set<int> selectedTaskIds = {};
 
+
+  // --- Title Modify Logic ---
+
+  void startEditingTitle(String currentTitle) {
+    titleEditController = TextEditingController(text: currentTitle);
+    isEditingTitle = true;
+    notifyListeners();
+  }
+
+  void stopEditingTitle(MyAppState appState, int listId) {
+    final newName = titleEditController.text.trim();
+    if (newName.isNotEmpty) {
+      final list = appState.getListById(listId);
+      if (list != null) {
+        appState.updateListName(list, newName);
+      }
+    }
+    isEditingTitle = false;
+    notifyListeners();
+  }
+  
+
   // --- Image Logic ---
+
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await ImageService.pickImage(source);
     if (pickedFile != null) {
@@ -26,7 +51,19 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateListImage(MyAppState appState, int listId, ImageSource source) async {
+    final pickedFile = await ImageService.pickImage(source);
+    if (pickedFile != null) {
+      final list = appState.getListById(listId);
+      if (list != null) {
+        appState.updateListImage(list, pickedFile.path);
+      }
+    }
+  }
+
+
   // --- Edit Mode Logic ---
+
   void toggleEditMode() {
     isEditMode = !isEditMode;
     if (!isEditMode) selectedTaskIds.clear();

@@ -70,7 +70,7 @@ class TaskListView extends StatelessWidget {
             
             onTapInstantDelete: () => appState.deleteTask(listId, task.id),
             
-            updateImagePath: (newPath) => appState.updateImage(task, newPath),
+            updateImagePath: (newPath) => appState.updateTaskImage(task, newPath),
           ),
         );
       },

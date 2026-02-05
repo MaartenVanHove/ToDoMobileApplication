@@ -4,10 +4,15 @@ class AppStrings {
       'empty_state': 'No cards yet! 🎉',
       'hint_text': 'Enter new Task...',
       'undo_tooltip': 'Undo finished task',
+      'rename': 'Rename',
+      'change_image': 'Change Cover',
     },
     'collection_screen': {
       'title': 'My Collections',
       'add_list_hint': 'Create a new list name...',
+    },
+    'add_list_screen': {
+      'title': 'Add List',
     },
     'dialogs': {
       'rename_title': "Change name",
@@ -16,7 +21,6 @@ class AppStrings {
     },
   };
 
-  // The "Selector" method
   static String get(String page, String key) {
     return _strings[page]?[key] ?? "String not found";
   }

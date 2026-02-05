@@ -1,4 +1,6 @@
+import 'package:first_project/core/constants/app_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/screens/list/list_controller.dart';
@@ -18,34 +20,59 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
     final appState = context.read<MyAppState>();
     final listController = context.watch<ListController>();
 
-    return AppBar(
-      // 1. Set background to transparent
+  return AppBar(
       backgroundColor: Colors.transparent,
-      // 2. Remove the shadow/line under the AppBar
       elevation: 0,
       centerTitle: true,
-      // 3. Optional: Add a slight shadow to the text so it's readable over images
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 32,
-          shadows: [
-            Shadow(
-              blurRadius: 10.0,
-              color: Colors.black45,
-              offset: Offset(0, 2),
+      title: listController.isEditingTitle
+          ? TextField(
+              controller: listController.titleEditController,
+              autofocus: true,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w600),
+              decoration: const InputDecoration(border: InputBorder.none),
+              onSubmitted: (_) => listController.stopEditingTitle(appState, listId),
+            )
+          : GestureDetector(
+              onLongPress: () => listController.startEditingTitle(title),
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 32),
+              ),
+            ),
+      actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, color: Colors.white70, size: 28),
+          color: const Color(0xFF162238), // Kleur van het menu (donker thema)
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          onSelected: (value) {
+            // Hier handelen we de keuzes af
+            if (value == 'rename') {
+              listController.startEditingTitle(title);
+            } else if (value == 'image') {
+              listController.updateListImage(appState, listId, ImageSource.gallery);
+            }
+          },
+          itemBuilder: (BuildContext context) => [
+            PopupMenuItem<String>(
+              value: 'rename',
+              child: ListTile(
+                leading: Icon(Icons.edit, color: Colors.white),
+                title: Text(AppStrings.get('list_screen', 'rename'), style: TextStyle(color: Colors.white)),
+                contentPadding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+            PopupMenuItem<String>(
+              value: 'image',
+              child: ListTile(
+                leading: Icon(Icons.image, color: Colors.white),
+                title: Text(AppStrings.get('list_screen', 'change_image'), style: TextStyle(color: Colors.white)),
+                contentPadding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+              ),
             ),
           ],
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.white70, size: 28),
-          onPressed: () {
-            // Your menu logic here
-          },
         ),
       ],
     );

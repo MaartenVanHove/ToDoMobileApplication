@@ -1,12 +1,13 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:first_project/providers/app_state.dart';
 import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/services/media/image_service.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class AddNewListScreen extends StatefulWidget {
   final int collectionId;
@@ -23,6 +24,20 @@ class AddNewListScreen extends StatefulWidget {
 class _AddNewListScreenState extends State<AddNewListScreen> {
   final TextEditingController controller = TextEditingController();
   File? _imageFile;
+
+  // 🎨 COLOR STATE
+  Color _selectedColor = const Color(0xFF162238);
+
+  final List<Color> _colorPalette = [
+    const Color(0xFF162238), // Default Dark
+    const Color(0xFF3A7AFE), // Blue
+    const Color(0xFFE91E63), // Pink
+    const Color(0xFFFF9800), // Orange
+    const Color(0xFF4CAF50), // Green
+    const Color(0xFF9C27B0), // Purple
+    const Color(0xFF00BCD4), // Cyan
+    const Color(0xFF607D8B), // Steel
+  ];
 
   // ---------------- IMAGE LOGIC ----------------
 
@@ -41,18 +56,18 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
                 leading: const Icon(Icons.photo_library, color: Colors.white),
                 title: const Text('Photo Gallery', style: TextStyle(color: Colors.white)),
                 onTap: () async {
-                  _imageFile = await ImageService.pickImage(ImageSource.gallery);
-                  Navigator.pop(context);
-                  setState(() {});
+                  final picked = await ImageService.pickImage(ImageSource.gallery);
+                  if (picked != null) setState(() => _imageFile = picked);
+                  if (context.mounted) Navigator.pop(context);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: Colors.white),
                 title: const Text('Camera', style: TextStyle(color: Colors.white)),
                 onTap: () async {
-                  _imageFile = await ImageService.pickImage(ImageSource.camera);
-                  Navigator.pop(context);
-                  setState(() {});
+                  final picked = await ImageService.pickImage(ImageSource.camera);
+                  if (picked != null) setState(() => _imageFile = picked);
+                  if (context.mounted) Navigator.pop(context);
                 },
               ),
               if (_imageFile != null)
@@ -76,13 +91,22 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   Widget _buildImagePickerSection() {
     return GestureDetector(
       onTap: () => _showPickerOptions(context),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF162238),
+          // Use the selected color as background if no image exists
+          color: _imageFile != null ? Colors.black : _selectedColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10),
+          boxShadow: [
+            BoxShadow(
+              color: _selectedColor.withOpacity(0.2),
+              blurRadius: 20,
+              spreadRadius: 2,
+            )
+          ],
         ),
         child: _imageFile != null
             ? ClipRRect(
@@ -91,21 +115,19 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
                   fit: StackFit.expand,
                   children: [
                     Image.file(_imageFile!, fit: BoxFit.cover),
-                    Container(color: Colors.black26), // Slight overlay
-                    const Center(
-                      child: Icon(Icons.edit, color: Colors.white, size: 40),
-                    ),
+                    Container(color: Colors.black38),
+                    const Center(child: Icon(Icons.edit, color: Colors.white, size: 40)),
                   ],
                 ),
               )
             : const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo, color: Colors.white54, size: 48),
+                  Icon(Icons.add_a_photo, color: Colors.white70, size: 48),
                   SizedBox(height: 12),
                   Text(
                     "Add List Cover Photo",
-                    style: TextStyle(color: Colors.white54, fontSize: 16),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
               ),
@@ -113,41 +135,92 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     );
   }
 
+  Widget _buildColorPickerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Card Theme Color",
+          style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 55,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _colorPalette.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 15),
+            itemBuilder: (context, index) {
+              final color = _colorPalette[index];
+              final isSelected = _selectedColor == color;
+
+              return GestureDetector(
+                onTap: () => setState(() => _selectedColor = color),
+                child: Container(
+                  width: 55,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? Colors.white : Colors.transparent,
+                      width: 3,
+                    ),
+                  ),
+                  child: isSelected 
+                      ? const Icon(Icons.check, color: Colors.white, size: 24) 
+                      : null,
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<MyAppState>();
-
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A0F1F),
-        title: const Text('Add List'),
-        titleTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 28),
+        elevation: 0,
+        title: const Text('Create New List'),
+        titleTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 24),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildImagePickerSection(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
+                _buildColorPickerSection(),
+                const SizedBox(height: 32),
                 TextField(
                   controller: controller,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
                   decoration: InputDecoration(
-                    labelText: "Enter list name *",
+                    labelText: "List Name",
                     labelStyle: const TextStyle(color: Colors.white54),
                     filled: true,
                     fillColor: const Color(0xFF162238),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.label_outline, color: Colors.white54),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: _selectedColor, width: 2),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                _buildNextButton(context, appState),
+                const SizedBox(height: 40),
+                _buildCreateButton(),
               ],
             ),
           ),
@@ -156,55 +229,60 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     );
   }
 
-  Widget _buildNextButton(BuildContext context, MyAppState appState) {
+  Widget _buildCreateButton() {
+    final appState = context.read<MyAppState>();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () => _saveNewList(context, appState),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF3A7AFE),
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          backgroundColor: _selectedColor == const Color(0xFF162238) 
+              ? const Color(0xFF3A7AFE) 
+              : _selectedColor,
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 10,
+          shadowColor: _selectedColor.withOpacity(0.5),
         ),
-        child: const Text("Create List", style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+        child: const Text(
+          "Create List", 
+          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
 
   Future<void> _saveNewList(BuildContext context, MyAppState appState) async {
     final input = controller.text.trim();
-    if (input.isEmpty) return;
+    if (input.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a name for your list")),
+      );
+      return;
+    }
 
     String? finalImagePath;
 
-    // --- START VEILIG OPSLAAN LOGICA ---
     if (_imageFile != null) {
       try {
-        // 1. Zoek de permanente Documents map
         final directory = await getApplicationDocumentsDirectory();
-        
-        // 2. Maak een unieke bestandsnaam voor de lijst-cover
         final String fileName = "list_cover_${DateTime.now().millisecondsSinceEpoch}${p.extension(_imageFile!.path)}";
         final String newPath = p.join(directory.path, fileName);
-
-        // 3. Kopieer het bestand fysiek naar de veilige map
         final File savedImage = await _imageFile!.copy(newPath);
         finalImagePath = savedImage.path;
-        
-        debugPrint("List cover veilig opgeslagen: $finalImagePath");
       } catch (e) {
-        debugPrint("Fout bij opslaan list cover: $e");
-        // Optioneel: als kopiëren faalt, val terug op het tijdelijke pad
+        debugPrint("Error saving image: $e");
         finalImagePath = _imageFile?.path;
       }
     }
-    // --- EINDE VEILIG OPSLAAN LOGICA ---
 
-    // Gebruik nu 'finalImagePath' in plaats van '_imageFile?.path'
+    // Pass both the ImagePath and the Color (as an int) to the state
     final newListId = await appState.createList(
       input, 
       widget.collectionId, 
-      finalImagePath
+      finalImagePath,
+      // TODO: fix back-end
+      // color: _selectedColor.value, 
     );
 
     if (mounted) {

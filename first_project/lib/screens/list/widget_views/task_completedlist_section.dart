@@ -72,7 +72,7 @@ class TaskCompletedListView extends StatelessWidget {
               appState.deleteTask(listId, task.id);
             },
             onImageChanged: (newPath) {
-              appState.updateImage(task, newPath);
+              appState.updateTaskImage(task, newPath);
             },
           ),
         );
