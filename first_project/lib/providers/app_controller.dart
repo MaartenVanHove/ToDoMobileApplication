@@ -5,7 +5,7 @@ import 'package:first_project/models/todo_list.dart';
 import 'package:first_project/services/db/database_helper.dart';
 import 'package:flutter/material.dart';
 
-class MyAppState extends ChangeNotifier {
+class AppController extends ChangeNotifier {
   // All collections
   List<Collection> collections = [];
 
@@ -17,7 +17,7 @@ class MyAppState extends ChangeNotifier {
 
   final db = DatabaseServices.instance;
 
-  MyAppState() {
+  AppController() {
     loadCollections();
   }
 

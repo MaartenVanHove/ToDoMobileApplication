@@ -1,4 +1,4 @@
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/collections/collection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => MyAppState(),
+      create: (_) => AppController(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Todo List',

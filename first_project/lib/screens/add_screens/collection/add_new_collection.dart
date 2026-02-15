@@ -1,4 +1,4 @@
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/collections/collection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +9,7 @@ class AddNewCollectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<MyAppState>();
+    final appState = context.watch<AppController>();
 
     return Scaffold(
       appBar: _buildTitle(),
@@ -60,7 +60,7 @@ class AddNewCollectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNextButton(BuildContext context, MyAppState appState) {
+  Widget _buildNextButton(BuildContext context, AppController appState) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -88,7 +88,7 @@ class AddNewCollectionScreen extends StatelessWidget {
 
   Future<void> _saveNewCollection(
     BuildContext context,
-    MyAppState appState,
+    AppController appState,
   ) async {
     final input = controller.text.trim();
 

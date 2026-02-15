@@ -2,7 +2,7 @@ import 'package:first_project/core/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/list/list_controller.dart';
 
 class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
@@ -17,7 +17,7 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.read<MyAppState>();
+    final appState = context.read<AppController>();
     final listController = context.watch<ListController>();
 
   return AppBar(
@@ -34,7 +34,7 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
               onSubmitted: (_) => listController.stopEditingTitle(appState, listId),
             )
           : GestureDetector(
-              onLongPress: () => listController.startEditingTitle(title),
+              onTap: () => listController.startEditingTitle(title),
               child: Text(
                 title,
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 32),

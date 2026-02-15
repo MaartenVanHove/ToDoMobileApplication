@@ -9,7 +9,7 @@ import 'package:first_project/screens/list/widget_views/title.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/list/list_controller.dart';
 
 class ListScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _ListScreenState extends State<ListScreen> {
     super.initState();
     // Laden van taken blijft hetzelfde
     Future.microtask(() {
-      context.read<MyAppState>().loadTasks(widget.listId);
+      context.read<AppController>().loadTasks(widget.listId);
     });
   }
 
@@ -40,7 +40,7 @@ class _ListScreenState extends State<ListScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ListController(),
-      child: Consumer2<MyAppState, ListController>(
+      child: Consumer2<AppController, ListController>(
         builder: (context, appState, listController, child) {
           final allTasks = appState.tasks[widget.listId] ?? [];
           final todoTasks = allTasks.where((task) => !task.isFinished).toList();
@@ -59,7 +59,7 @@ class _ListScreenState extends State<ListScreen> {
                       child: Column(
                         children: [
                           if (allTasks.isEmpty)
-                            _buildEmptyList(),
+                            _buildEmptyStateView(),
 
                           TaskListView(tasks: todoTasks, listId: widget.listId),
                           TaskCompletedListView(tasks: finishedTasks, listId: widget.listId),
@@ -82,7 +82,7 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
-  Widget _buildEmptyList() {
+  Widget _buildEmptyStateView() {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Text(

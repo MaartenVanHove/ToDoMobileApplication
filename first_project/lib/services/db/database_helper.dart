@@ -68,21 +68,20 @@ class DatabaseServices {
         ALTER TABLE todo_lists
         ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0
       ''');
+    }
 
+    if (oldVersion < 3) {
+      await db.execute('''
+        ALTER TABLE todo_lists 
+        ADD COLUMN image_path TEXT
+      ''');
+    }
 
-      if (oldVersion < 3) {
-        await db.execute('''
-          ALTER TABLE todo_lists 
-          ADD COLUMN image_path TEXT
-        ''');
-      }
-
-      if (oldVersion < 4) {
-        await db.execute('''
-          ALTER TABLE tasks 
-          ADD COLUMN image_path TEXT
-        ''');
-      }
+    if (oldVersion < 4) {
+      await db.execute('''
+        ALTER TABLE tasks 
+        ADD COLUMN image_path TEXT
+      ''');
     }
   }
 

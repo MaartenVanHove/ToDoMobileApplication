@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import '../../providers/app_state.dart';
+import '../../providers/app_controller.dart';
 import '../../services/media/image_service.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,12 +23,12 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stopEditingTitle(MyAppState appState, int listId) {
+  void stopEditingTitle(AppController appController, int listId) {
     final newName = titleEditController.text.trim();
     if (newName.isNotEmpty) {
-      final list = appState.getListById(listId);
+      final list = appController.getListById(listId);
       if (list != null) {
-        appState.updateListName(list, newName);
+        appController.updateListName(list, newName);
       }
     }
     isEditingTitle = false;
@@ -51,12 +51,12 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateListImage(MyAppState appState, int listId, ImageSource source) async {
+  Future<void> updateListImage(AppController appController, int listId, ImageSource source) async {
     final pickedFile = await ImageService.pickImage(source);
     if (pickedFile != null) {
-      final list = appState.getListById(listId);
+      final list = appController.getListById(listId);
       if (list != null) {
-        appState.updateListImage(list, pickedFile.path);
+        appController.updateListImage(list, pickedFile.path);
       }
     }
   }
@@ -95,7 +95,7 @@ class ListController extends ChangeNotifier {
   }
 
   // --- Database Actions ---
-  Future<void> saveTask(MyAppState appState, int listId) async {
+  Future<void> saveTask(AppController appController, int listId) async {
     final name = textController.text.trim();
     if (name.isEmpty) return;
 
@@ -112,15 +112,15 @@ class ListController extends ChangeNotifier {
       }
     }
 
-    appState.addTask(listId, name, savedPath);
+    appController.addTask(listId, name, savedPath);
     textController.clear();
     imageFile = null;
     notifyListeners();
   }
 
-  void deleteSelected(MyAppState appState, int listId) {
+  void deleteSelected(AppController appController, int listId) {
     for (var id in selectedTaskIds) {
-      appState.deleteTask(listId, id);
+      appController.deleteTask(listId, id);
     }
     isEditMode = false;
     selectedTaskIds.clear();

@@ -1,5 +1,5 @@
 import 'package:first_project/models/collection.dart';
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list/list_screen.dart';
@@ -18,15 +18,18 @@ class CollectionsScreen extends StatefulWidget {
 class _CollectionsScreenState extends State<CollectionsScreen> {
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<MyAppState>();
-    final List<Collection> collections =
-      appState.collections;
+    final appState = context.watch<AppController>();
+    final List<Collection> collections = appState.collections;
+    
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0A0F1F), // Matches your theme
       floatingActionButton: _buildFloatingActionButton(context),
       appBar: _buildTitle(),
       body: SafeArea(
         child: ListView.builder(
+          // Adds space at the top of the list and bottom (for FAB clearance)
+          padding: const EdgeInsets.only(top: 16, bottom: 100),
           itemCount: collections.length,
           itemBuilder: (context, index) {
             final collection = collections[index];
@@ -34,12 +37,14 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 1. COLLECTION HEADER
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(children: [
+                      Row(
+                        children: [
                           Text(
                             collection.name,
                             style: const TextStyle(
@@ -63,26 +68,22 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                             },
                             icon: const Icon(
                               Icons.drive_file_rename_outline,
-                              color: const Color(0xFF9BB3D1),
+                              color: Color(0xFF9BB3D1),
                               size: 24,
                             ),
                           ),
                         ],
                       ),
-                      
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () {
-                              _navigateToAddListScreen(context, collection.id);
-                            },
+                            onPressed: () => _navigateToAddListScreen(context, collection.id),
                             icon: const Icon(
                               Icons.add_circle_outline,
-                              color: const Color(0xFF9BB3D1),
+                              color: Color(0xFF9BB3D1),
                               size: 28,
                             ),
                           ),
-
                           IconButton(
                             onPressed: () {
                               showDialog(
@@ -99,27 +100,33 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                             },
                             icon: const Icon(
                               Icons.delete_forever,
-                              color: const Color(0xFF9BB3D1),
+                              color: Color(0xFF9BB3D1),
                               size: 28,
                             ),
                           ),
-                        ]
+                        ],
                       ),
                     ],
                   ),
                 ),
+
+                // 2. HORIZONTAL LIST OF TODO LISTS
                 _buildListView(context, appState, collection.id),
+
+                // 3. SPACING BETWEEN COLLECTIONS
+                // This creates the visual gap before the next collection starts
+                const SizedBox(height: 32),
               ],
             );
           },
-        )
+        ),
       ),
     );
   }
 
   Widget _buildListView(
     BuildContext context,
-    MyAppState appState,
+    AppController appState,
     int collectionId,
   ) {
     final todoListsInCollection = appState.lists[collectionId] ?? [];
@@ -129,11 +136,10 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
       child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
         buildDefaultDragHandles: false,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: todoListsInCollection.length + 1,
         onReorder: (oldIndex, newIndex) {
-          // Block moving the Add card
-          if (oldIndex >= todoListsInCollection.length ||
-              newIndex > todoListsInCollection.length) {
+          if (oldIndex >= todoListsInCollection.length || newIndex > todoListsInCollection.length) {
             return;
           }
 
@@ -147,14 +153,13 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
           });
         },
         itemBuilder: (context, index) {
-          // ➕ ADD LIST CARD (static, last)
+          // ADD LIST CARD (static, last)
           if (index == todoListsInCollection.length) {
             return Padding(
               key: const ValueKey('add_list_card'),
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: AddListCard(
-                onTap: () =>
-                    _navigateToAddListScreen(context, collectionId),
+                onTap: () => _navigateToAddListScreen(context, collectionId),
               ),
             );
           }
@@ -167,7 +172,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             child: ListCard(
               listName: todoList.name,
               imagePath: todoList.imagePath,
-              index: index, // used by ReorderableDragStartListener
+              index: index,
               onTap: () => _navigateToListScreen(
                 context,
                 todoList.id,
@@ -191,29 +196,25 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
     );
   }
 
-
-
   AppBar _buildTitle() {
     return AppBar(
-        backgroundColor: const Color(0xFF0A0F1F),
-        title: Text('COLLECTIONS'),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 32
-        ),
-        centerTitle: true
-      );
+      backgroundColor: const Color(0xFF0A0F1F),
+      elevation: 0,
+      title: const Text('COLLECTIONS'),
+      titleTextStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+        fontSize: 32,
+      ),
+      centerTitle: true,
+    );
   }
 
   FloatingActionButton _buildFloatingActionButton(BuildContext context) {
     return FloatingActionButton.extended(
       onPressed: () => _navigateToAddCollectionScreen(context),
       backgroundColor: const Color(0xFF3A7AFE),
-      icon: const Icon(
-        Icons.add,
-        color: Colors.white,
-      ),
+      icon: const Icon(Icons.add, color: Colors.white),
       label: const Text(
         "Collection",
         style: TextStyle(
@@ -228,27 +229,21 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
   void _navigateToAddCollectionScreen(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => AddNewCollectionScreen(),
-      )
+      MaterialPageRoute(builder: (_) => AddNewCollectionScreen()),
     );
   }
 
-  void _navigateToAddListScreen(BuildContext context, var collectionId) {
+  void _navigateToAddListScreen(BuildContext context, int collectionId) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => AddNewListScreen(collectionId: collectionId,),
-      )
+      MaterialPageRoute(builder: (_) => AddNewListScreen(collectionId: collectionId)),
     );
   }
 
-  void _navigateToListScreen(BuildContext context, var listId, var listName) {
+  void _navigateToListScreen(BuildContext context, int listId, String listName) {
     Navigator.push(
-      context,  
-      MaterialPageRoute(
-        builder: (_) => ListScreen(listId: listId, listName: listName,),
-      )
+      context,
+      MaterialPageRoute(builder: (_) => ListScreen(listId: listId, listName: listName)),
     );
   }
 }

@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:image_picker/image_picker.dart';
 
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/list/list_screen.dart';
 import 'package:first_project/services/media/image_service.dart';
 
@@ -230,7 +230,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   }
 
   Widget _buildCreateButton() {
-    final appState = context.read<MyAppState>();
+    final appState = context.read<AppController>();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -252,7 +252,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     );
   }
 
-  Future<void> _saveNewList(BuildContext context, MyAppState appState) async {
+  Future<void> _saveNewList(BuildContext context, AppController appState) async {
     final input = controller.text.trim();
     if (input.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

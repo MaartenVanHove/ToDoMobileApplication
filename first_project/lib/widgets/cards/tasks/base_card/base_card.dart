@@ -83,6 +83,7 @@ class BaseTaskCard extends StatelessWidget {
                                         File? newImage = await ImageService.pickImage(ImageSource.gallery);
                                         if (newImage != null) {
                                           onImageChanged(newImage.path);
+                                          setDialogState(() {}); // Update preview in dialog
                                         }
                                       },
                                     ),
@@ -92,14 +93,14 @@ class BaseTaskCard extends StatelessWidget {
                             ),
 
                             // 2. TEXT SECTION
-                            Container(
+                            SizedBox(
                               width: double.infinity,
                               child: Stack(
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(20, 30, 40, 20),
                                     child: Text(
-                                      title, // Toont de actuele titel vanuit de widget
+                                      title,
                                       style: textStyle.copyWith(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
@@ -114,11 +115,7 @@ class BaseTaskCard extends StatelessWidget {
                                     child: IconButton(
                                       icon: const Icon(Icons.edit_note, color: Color(0xFF9BB3D1), size: 26),
                                       onPressed: () async {
-                                        // Roep de hernoem functie aan
                                         onTapUpdateName();
-                                        
-                                        // We wachten heel kort zodat de parent state (Provider/Bloc) 
-                                        // de kans krijgt om de 'title' variabele bij te werken
                                         await Future.delayed(const Duration(milliseconds: 100));
                                         setDialogState(() {});
                                       },
@@ -157,6 +154,12 @@ class BaseTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 📏 DYNAMIC HEIGHT LOGIC
+    // We calculate height as a percentage of the screen height.
+    // .clamp ensures it doesn't get too small on old phones or too huge on tablets.
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dynamicCardHeight = (screenHeight * 0.09).clamp(65.0, 95.0);
+
     return Card(
       color: backgroundColor,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -171,60 +174,70 @@ class BaseTaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         onTap: isEditMode ? onTapSelect : () => _showImagePreview(context),
         onLongPress: isEditMode == false ? onPressedEdit : null,
-        child: Row(
-          children: [
-            // if (isEditMode)
-            //   Padding(
-            //     padding: const EdgeInsets.only(left: 8.0),
-            //     child: IconButton(
-            //       onPressed: onTapUpdateName,
-            //       visualDensity: VisualDensity.compact,
-            //       icon: const Icon(Icons.edit, color: Colors.white),
-            //     ),
-            //   ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: imagePath != null
-                  ? ClipRRect(
+        child: Container(
+          height: dynamicCardHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              // DYNAMIC IMAGE SECTION
+              if (imagePath != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AspectRatio(
+                    aspectRatio: 1, // Forces the image to be a square
+                    child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        width: 56,
-                        height: 56,
                         color: Colors.black26,
                         child: Image.file(
                           File(imagePath!),
                           fit: BoxFit.cover,
                         ),
                       ),
-                    )
-                  : const SizedBox(width: 0, height: 56),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: textStyle,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(width: 12), // Spacer if no image
+
+              // TEXT SECTION
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textStyle.copyWith(
+                      // Optional: make font size slightly responsive
+                      fontSize: (dynamicCardHeight * 0.22).clamp(14.0, 18.0),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            if (showDragHandle && !isEditMode)
-              ReorderableDragStartListener(
-                index: index,
-                child: const Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(Icons.drag_indicator, color: Colors.white70, size: 26),
+
+              // 🖐️ DRAG HANDLE
+              if (showDragHandle && !isEditMode)
+                ReorderableDragStartListener(
+                  index: index,
+                  child: const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: Icon(Icons.drag_indicator, color: Colors.white70, size: 26),
+                  ),
                 ),
-              ),
-            if (isEditMode)
-              IconButton(
-                onPressed: onTapInstantDelete,
-                visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.delete_forever, color: Colors.white),
-              ),
-          ],
+
+              // 🗑️ DELETE ICON (Edit Mode)
+              if (isEditMode)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: IconButton(
+                    onPressed: onTapInstantDelete,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.delete_forever, color: Colors.white),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

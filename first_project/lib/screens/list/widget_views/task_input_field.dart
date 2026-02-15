@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:first_project/screens/list/list_controller.dart';
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 
 class TaskInputField extends StatelessWidget {
   final int listId;
@@ -12,7 +12,7 @@ class TaskInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<MyAppState>();
+    final appState = context.read<AppController>();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -101,7 +101,7 @@ class TaskInputField extends StatelessWidget {
     );
   }
 
-  Widget _buildAddButton(BuildContext context, ListController controller, MyAppState appState) {
+  Widget _buildAddButton(BuildContext context, ListController controller, AppController appState) {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF3A7AFE),

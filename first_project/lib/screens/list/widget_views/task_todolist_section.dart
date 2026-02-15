@@ -1,5 +1,5 @@
 import 'package:first_project/models/task.dart';
-import 'package:first_project/providers/app_state.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/list/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/todo_card.dart';
 import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
@@ -19,7 +19,7 @@ class TaskListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<MyAppState>();
+    final appState = context.read<AppController>();
 
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
