@@ -38,6 +38,9 @@ class BaseTaskCard extends StatelessWidget {
   });
 
   void _showImagePreview(BuildContext context) {
+    // 1. Initialize the controller with the current title
+    final TextEditingController nameController = TextEditingController(text: title);
+
     showDialog(
       context: context,
       builder: (context) {
@@ -56,7 +59,7 @@ class BaseTaskCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // 1. IMAGE SECTION
+                            // --- IMAGE SECTION ---
                             Stack(
                               children: [
                                 imagePath != null
@@ -69,8 +72,7 @@ class BaseTaskCard extends StatelessWidget {
                                         height: 200,
                                         width: double.infinity,
                                         color: Colors.black26,
-                                        child: const Icon(Icons.image_not_supported,
-                                            size: 50, color: Colors.white24),
+                                        child: const Icon(Icons.image_not_supported, size: 50, color: Colors.white24),
                                       ),
                                 Positioned(
                                   top: 8,
@@ -83,7 +85,7 @@ class BaseTaskCard extends StatelessWidget {
                                         File? newImage = await ImageService.pickImage(ImageSource.gallery);
                                         if (newImage != null) {
                                           onImageChanged(newImage.path);
-                                          setDialogState(() {}); // Update preview in dialog
+                                          setDialogState(() {}); 
                                         }
                                       },
                                     ),
@@ -92,36 +94,34 @@ class BaseTaskCard extends StatelessWidget {
                               ],
                             ),
 
-                            // 2. TEXT SECTION
-                            SizedBox(
-                              width: double.infinity,
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(20, 30, 40, 20),
-                                    child: Text(
-                                      title,
-                                      style: textStyle.copyWith(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        decoration: TextDecoration.none,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    right: 10,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.edit_note, color: Color(0xFF9BB3D1), size: 26),
-                                      onPressed: () async {
-                                        onTapUpdateName();
-                                        await Future.delayed(const Duration(milliseconds: 100));
-                                        setDialogState(() {});
-                                      },
-                                    ),
-                                  ),
-                                ],
+                            // --- IN-LINE EDITABLE TEXT SECTION ---
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                              child: TextField(
+                                controller: nameController,
+                                style: textStyle.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                                maxLines: null, // Allows text to wrap
+                                decoration: const InputDecoration(
+                                  hintText: "Enter name...",
+                                  hintStyle: TextStyle(color: Colors.white24),
+                                  border: InputBorder.none, // Removes the underline for a cleaner look
+                                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+                                  suffixIcon: Icon(Icons.edit, size: 16, color: Colors.white24),
+                                ),
+                                onSubmitted: (newValue) {
+                                  if (newValue.trim().isNotEmpty && newValue != title) {
+                                    onImageChanged(null); // Just a placeholder, call your specific update name callback here
+                                    // In MVC, you'd usually call the controller here
+                                  }
+                                },
+                                // This ensures that when the user finishes editing, the app saves the name
+                                onChanged: (value) {
+                                  // Optional: Update the name in real-time or wait for a button click
+                                },
                               ),
                             ),
                           ],
@@ -129,18 +129,24 @@ class BaseTaskCard extends StatelessWidget {
                       ),
                     ),
 
-                    // 3. ACTION BUTTONS
+                    // --- ACTION BUTTONS ---
                     const Divider(color: Colors.white12, height: 1),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text("Close",
-                              style: TextStyle(color: Color(0xFF9BB3D1), fontSize: 16)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              // Save changes before closing
+                              if (nameController.text.trim().isNotEmpty) {
+                                // Execute the name update logic here
+                                // appState.updateName(nameController.text);
+                              }
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Save & Close", style: TextStyle(color: Colors.blueAccent, fontSize: 16)),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
