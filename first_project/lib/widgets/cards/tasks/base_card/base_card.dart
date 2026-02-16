@@ -185,9 +185,6 @@ void _showImagePreview(BuildContext context) {
 
   @override
   Widget build(BuildContext context) {
-    // 📏 DYNAMIC HEIGHT LOGIC
-    // We calculate height as a percentage of the screen height.
-    // .clamp ensures it doesn't get too small on old phones or too huge on tablets.
     final screenHeight = MediaQuery.of(context).size.height;
     final dynamicCardHeight = (screenHeight * 0.09).clamp(65.0, 95.0);
 
