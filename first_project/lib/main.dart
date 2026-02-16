@@ -1,7 +1,7 @@
-import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/screens/collections/collection_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

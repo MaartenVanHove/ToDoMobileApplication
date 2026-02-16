@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class BaseTaskCard extends StatelessWidget {
   final String title;
@@ -13,6 +15,7 @@ class BaseTaskCard extends StatelessWidget {
   final VoidCallback onTapInstantDelete;
   final VoidCallback? onPressedEdit;
   final Function(String?) onImageChanged;
+  final Function(String) onTextChanged;
   final bool isEditMode;
   final bool isSelected;
   final bool showDragHandle;
@@ -29,6 +32,7 @@ class BaseTaskCard extends StatelessWidget {
     required this.onTapUpdateName,
     required this.onTapInstantDelete,
     required this.onImageChanged,
+    required this.onTextChanged,
     this.onPressedEdit,
     required this.isEditMode,
     required this.isSelected,
@@ -37,13 +41,18 @@ class BaseTaskCard extends StatelessWidget {
     required this.textStyle,
   });
 
-  void _showImagePreview(BuildContext context) {
-    // 1. Initialize the controller with the current title
+void _showImagePreview(BuildContext context) {
+    // 1. Create local variables to track state changes INSIDE the dialog.
+    // This allows the user to see updates without the dialog closing.
+    String currentTitle = title;
+    String? currentImagePath = imagePath;
+    
+    // 2. Initialize the controller with the current title.
     final TextEditingController nameController = TextEditingController(text: title);
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return Dialog(
@@ -59,12 +68,12 @@ class BaseTaskCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // --- IMAGE SECTION ---
+                            // --- 🖼️ IMAGE SECTION ---
                             Stack(
                               children: [
-                                imagePath != null
+                                currentImagePath != null
                                     ? Image.file(
-                                        File(imagePath!),
+                                        File(currentImagePath!),
                                         width: double.infinity,
                                         fit: BoxFit.contain,
                                       )
@@ -72,7 +81,8 @@ class BaseTaskCard extends StatelessWidget {
                                         height: 200,
                                         width: double.infinity,
                                         color: Colors.black26,
-                                        child: const Icon(Icons.image_not_supported, size: 50, color: Colors.white24),
+                                        child: const Icon(Icons.image_not_supported,
+                                            size: 50, color: Colors.white24),
                                       ),
                                 Positioned(
                                   top: 8,
@@ -80,12 +90,19 @@ class BaseTaskCard extends StatelessWidget {
                                   child: CircleAvatar(
                                     backgroundColor: Colors.black54,
                                     child: IconButton(
-                                      icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.white, size: 20),
                                       onPressed: () async {
-                                        File? newImage = await ImageService.pickImage(ImageSource.gallery);
+                                        File? newImage = await ImageService.pickImage(
+                                            ImageSource.gallery);
                                         if (newImage != null) {
+                                          // Update the actual data (Database/Provider)
                                           onImageChanged(newImage.path);
-                                          setDialogState(() {}); 
+                                          
+                                          // Update the local dialog UI
+                                          setDialogState(() {
+                                            currentImagePath = newImage.path;
+                                          });
                                         }
                                       },
                                     ),
@@ -94,7 +111,7 @@ class BaseTaskCard extends StatelessWidget {
                               ],
                             ),
 
-                            // --- IN-LINE EDITABLE TEXT SECTION ---
+                            // --- 📝 IN-LINE EDITABLE TEXT SECTION ---
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                               child: TextField(
@@ -103,24 +120,23 @@ class BaseTaskCard extends StatelessWidget {
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
+                                  decoration: TextDecoration.none,
                                 ),
-                                maxLines: null, // Allows text to wrap
+                                maxLines: null,
                                 decoration: const InputDecoration(
                                   hintText: "Enter name...",
                                   hintStyle: TextStyle(color: Colors.white24),
-                                  border: InputBorder.none, // Removes the underline for a cleaner look
-                                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
-                                  suffixIcon: Icon(Icons.edit, size: 16, color: Colors.white24),
+                                  border: InputBorder.none,
+                                  focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.blueAccent)),
                                 ),
                                 onSubmitted: (newValue) {
-                                  if (newValue.trim().isNotEmpty && newValue != title) {
-                                    onImageChanged(null); // Just a placeholder, call your specific update name callback here
-                                    // In MVC, you'd usually call the controller here
+                                  if (newValue.trim().isNotEmpty && newValue != currentTitle) {
+                                    onTextChanged(newValue);
+                                    setDialogState(() {
+                                      currentTitle = newValue;
+                                    });
                                   }
-                                },
-                                // This ensures that when the user finishes editing, the app saves the name
-                                onChanged: (value) {
-                                  // Optional: Update the name in real-time or wait for a button click
                                 },
                               ),
                             ),
@@ -129,24 +145,29 @@ class BaseTaskCard extends StatelessWidget {
                       ),
                     ),
 
-                    // --- ACTION BUTTONS ---
+                    // --- 🔘 ACTION BUTTONS ---
                     const Divider(color: Colors.white12, height: 1),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              // Save changes before closing
-                              if (nameController.text.trim().isNotEmpty) {
-                                // Execute the name update logic here
-                                // appState.updateName(nameController.text);
-                              }
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Save & Close", style: TextStyle(color: Colors.blueAccent, fontSize: 16)),
-                          ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: () {
+                          final finalValue = nameController.text.trim();
+                          // Final check: Save the text if it changed and user didn't hit 'enter'
+                          if (finalValue.isNotEmpty && finalValue != title) {
+                            onTextChanged(finalValue);
+                          }
+                          // Use dialogContext to pop safely
+                          Navigator.pop(dialogContext);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Text("Save & Close",
+                              style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -156,6 +177,10 @@ class BaseTaskCard extends StatelessWidget {
         );
       },
     );
+    // ).then((_) {
+    //   // 3. Clean up the controller only AFTER the dialog is fully closed.
+    //   nameController.dispose();
+    // });
   }
 
   @override

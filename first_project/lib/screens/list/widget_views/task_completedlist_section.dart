@@ -74,6 +74,9 @@ class TaskCompletedListView extends StatelessWidget {
             onImageChanged: (newPath) {
               appState.updateTaskImage(task, newPath);
             },
+            onTextChanged: (newText) {
+              appState.updateTaskName(task, newText);
+            },
           ),
         );
       },

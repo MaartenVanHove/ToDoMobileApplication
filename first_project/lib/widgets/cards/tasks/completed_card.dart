@@ -10,6 +10,7 @@ class FinishedCard extends StatelessWidget {
   final VoidCallback onTapUpdateName;
   final VoidCallback onTapInstantDelete;
   final Function(String?) onImageChanged;
+  final Function(String) onTextChanged;
   final VoidCallback? onPressedEdit;
   final bool isEditMode;
   final bool isSelected;
@@ -23,6 +24,7 @@ class FinishedCard extends StatelessWidget {
     required this.onTapUpdateName,
     required this.onTapInstantDelete,
     required this.onImageChanged,
+    required this.onTextChanged,
     this.onPressedEdit,
     required this.isEditMode,
     required this.isSelected,
@@ -38,6 +40,7 @@ class FinishedCard extends StatelessWidget {
       onTapUpdateName: onTapUpdateName,
       onTapInstantDelete: onTapInstantDelete,
       onImageChanged: onImageChanged,
+      onTextChanged: onTextChanged,
       onPressedEdit: onPressedEdit,
       isEditMode: isEditMode,
       isSelected: isSelected,
