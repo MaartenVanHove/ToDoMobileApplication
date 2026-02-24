@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class ListCard extends StatelessWidget {
   final String listName;
   final String? imagePath;
+  final String colorHex;
   final VoidCallback? onTap;
   final VoidCallback? onPressed;
   final int index;
@@ -12,6 +13,7 @@ class ListCard extends StatelessWidget {
     super.key,
     required this.listName,
     this.imagePath,
+    required this.colorHex,
     required this.onTap,
     required this.onPressed,
     required this.index,
@@ -32,7 +34,7 @@ class ListCard extends StatelessWidget {
         height: dynamicHeight,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E2F4D),
+          color: Color(int.parse(colorHex, radix: 16)), // Use the colorHex for background color
           borderRadius: BorderRadius.circular(16),
           // 🖼️ THE FULL BACKGROUND IMAGE
           image: imagePath != null

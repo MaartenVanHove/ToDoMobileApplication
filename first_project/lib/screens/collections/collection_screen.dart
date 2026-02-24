@@ -172,6 +172,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             child: ListCard(
               listName: todoList.name,
               imagePath: todoList.imagePath,
+              colorHex: todoList.colorHex,
               index: index,
               onTap: () => _navigateToListScreen(
                 context,

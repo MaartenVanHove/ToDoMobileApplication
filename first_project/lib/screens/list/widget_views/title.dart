@@ -20,7 +20,7 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
     final appState = context.read<AppController>();
     final listController = context.watch<ListController>();
 
-    return AppBar(
+  return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       centerTitle: true,
@@ -29,42 +29,25 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
               controller: listController.titleEditController,
               autofocus: true,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white, 
-                fontSize: 32, 
-                fontWeight: FontWeight.w600
-              ),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-              ),
-              // --- STOP EDITING ON CLICK AWAY ---
-              onTapOutside: (pointerDownEvent) {
-                // This triggers when clicking anywhere that isn't the TextField
-                if (listController.isEditingTitle) {
-                  listController.stopEditingTitle(appState, listId);
-                  FocusScope.of(context).unfocus();
-                }
-              },
-              // --- STOP EDITING ON ENTER KEY ---
+              style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w600),
+              decoration: const InputDecoration(border: InputBorder.none),
               onSubmitted: (_) => listController.stopEditingTitle(appState, listId),
+              onTapOutside: (_) => listController.stopEditingTitle(appState, listId),
             )
           : GestureDetector(
               onTap: () => listController.startEditingTitle(title),
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white, 
-                  fontWeight: FontWeight.w600, 
-                  fontSize: 32
-                ),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 32),
               ),
             ),
       actions: [
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, color: Colors.white70, size: 28),
-          color: const Color(0xFF162238),
+          color: const Color(0xFF162238), // Kleur van het menu (donker thema)
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           onSelected: (value) {
+            // Hier handelen we de keuzes af
             if (value == 'rename') {
               listController.startEditingTitle(title);
             } else if (value == 'image') {
@@ -75,11 +58,8 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
             PopupMenuItem<String>(
               value: 'rename',
               child: ListTile(
-                leading: const Icon(Icons.edit, color: Colors.white),
-                title: Text(
-                  AppStrings.get('list_screen', 'rename'), 
-                  style: const TextStyle(color: Colors.white)
-                ),
+                leading: Icon(Icons.edit, color: Colors.white),
+                title: Text(AppStrings.get('list_screen', 'rename'), style: TextStyle(color: Colors.white)),
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
               ),
@@ -87,11 +67,8 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
             PopupMenuItem<String>(
               value: 'image',
               child: ListTile(
-                leading: const Icon(Icons.image, color: Colors.white),
-                title: Text(
-                  AppStrings.get('list_screen', 'change_image'), 
-                  style: const TextStyle(color: Colors.white)
-                ),
+                leading: Icon(Icons.image, color: Colors.white),
+                title: Text(AppStrings.get('list_screen', 'change_image'), style: TextStyle(color: Colors.white)),
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
               ),

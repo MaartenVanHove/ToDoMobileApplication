@@ -19,7 +19,7 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 4, // 
+      version: 5, // Newest version is 5 to include colors table
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -53,6 +53,16 @@ class DatabaseServices {
         FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE colors (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        hex_value TEXT NOT NULL DEFAULT '#FFFFFF',
+        list_id INTEGER NOT NULL,
+        FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -81,6 +91,18 @@ class DatabaseServices {
       await db.execute('''
         ALTER TABLE tasks 
         ADD COLUMN image_path TEXT
+      ''');
+    }
+
+    if(oldVersion < 5) {
+      await db.execute('''
+        CREATE TABLE colors (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          hex_value TEXT NOT NULL,
+          list_id INTEGER NOT NULL, 
+          FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
+        )
       ''');
     }
   }
@@ -124,11 +146,18 @@ class DatabaseServices {
 
   Future<List<Map<String, dynamic>>> getAllTodoLists(int collectionId) async {
     final db = await database;
-    return await db.query(
-      'todo_lists',
-      where: 'collection_id = ?',
-      whereArgs: [collectionId],
-    );
+    
+    // We use a LEFT JOIN so that if a list somehow doesn't have a color yet, 
+    // it still shows up in your UI.
+    return await db.rawQuery('''
+      SELECT 
+        todo_lists.*, 
+        colors.hex_value, 
+        colors.name AS color_name
+      FROM todo_lists
+      LEFT JOIN colors ON todo_lists.id = colors.list_id
+      WHERE todo_lists.collection_id = ?
+    ''', [collectionId]);
   }
 
   Future<List<Map<String, dynamic>>> getTasks(int listId) async {

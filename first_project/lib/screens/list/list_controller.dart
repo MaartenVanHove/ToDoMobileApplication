@@ -34,7 +34,6 @@ class ListController extends ChangeNotifier {
     isEditingTitle = false;
     notifyListeners();
   }
-  
 
   // --- Image Logic ---
 

@@ -11,12 +11,12 @@ class TaskInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // .watch ensures the widget rebuilds when text or images change
     final listController = context.watch<ListController>();
     final appState = context.read<AppController>();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      // color: const Color(0xFF0A0F1F),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -39,7 +39,7 @@ class TaskInputField extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => listController.clearImage(), // logic moved to controller
+                    onTap: () => listController.clearImage(),
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
@@ -55,6 +55,7 @@ class TaskInputField extends StatelessWidget {
           
           // 2. Input Row
           Row(
+            // Align items to the bottom so the Add button stays down while the field expands
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
@@ -64,22 +65,33 @@ class TaskInputField extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
-                    controller: listController.textController, // Use controller's text editor
+                    controller: listController.textController,
                     style: const TextStyle(color: Colors.white),
-                    // No need for setState on onChanged; Provider handles the rebuild
+                    
+                    // --- MULTILINE LOGIC ---
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 5, // Grow up to 5 lines before scrolling
+                    // -----------------------
+
+                    // This ensures the camera icon toggles visibility as you type
+                    onChanged: (text) => listController.notifyListeners(), 
+                    
                     decoration: InputDecoration(
                       hintText: 'Enter new Task...',
                       hintStyle: const TextStyle(color: Color(0xFF9BB3D1)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      contentPadding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
                       border: InputBorder.none,
                       suffixIcon: Row(
                         mainAxisSize: MainAxisSize.min,
+                        // Keeps icons at the bottom of the field when it expands
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
                             onPressed: () => listController.pickImage(ImageSource.gallery),
                           ),
-                          // Only show camera if text is empty (WhatsApp style)
+                          // Toggle visibility based on text input
                           if (listController.textController.text.isEmpty)
                             IconButton(
                               icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
@@ -103,6 +115,8 @@ class TaskInputField extends StatelessWidget {
 
   Widget _buildAddButton(BuildContext context, ListController controller, AppController appState) {
     return Container(
+      // Padding ensures it matches the height profile of a single-line input bar
+      margin: const EdgeInsets.only(bottom: 4), 
       decoration: const BoxDecoration(
         color: Color(0xFF3A7AFE),
         shape: BoxShape.circle,

@@ -81,7 +81,7 @@ class AppController extends ChangeNotifier {
   }
 
   // CREATE LIST inside a collection
-  Future<int> createList(String name, int collectionId, String? imagePath) async {
+  Future<int> createList(String name, int collectionId, String? imagePath, String colorHex) async {
     // 1. Save to Database (Ensure DatabaseServices.addTodoList accepts imagePath)
     final id = await db.addTodoList(imagePath, name, collectionId);
     
@@ -91,6 +91,7 @@ class AppController extends ChangeNotifier {
       name: name, 
       collectionId: collectionId, 
       imagePath: imagePath, // Make sure your TodoList model has this field
+      colorHex: colorHex,
     );
     
     // 3. Update local state
@@ -172,6 +173,7 @@ class AppController extends ChangeNotifier {
         collectionId: list.collectionId,
         name: name,
         imagePath: list.imagePath,
+        colorHex: list.colorHex,
       );
       notifyListeners();
     }
@@ -229,6 +231,7 @@ class AppController extends ChangeNotifier {
         collectionId: list.collectionId,
         name: list.name,
         imagePath: imagePath,
+        colorHex: list.colorHex,
       );
       notifyListeners();
     }

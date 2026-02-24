@@ -281,8 +281,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
       input, 
       widget.collectionId, 
       finalImagePath,
-      // TODO: fix back-end
-      // color: _selectedColor.value, 
+      _selectedColor.value.toRadixString(16).padLeft(8, '0'), // Convert color to hex string
     );
 
     if (mounted) {
