@@ -165,6 +165,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
           }
 
           final todoList = todoListsInCollection[index];
+          print('TODOLIST: ${todoList.name}, COLOR ID: ${todoList.colorId}'); // Debug print to check colorId
 
           return Padding(
             key: ValueKey(todoList.id),
@@ -172,7 +173,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             child: ListCard(
               listName: todoList.name,
               imagePath: todoList.imagePath,
-              colorHex: todoList.colorHex,
+              colorId: todoList.colorId,
               index: index,
               onTap: () => _navigateToListScreen(
                 context,

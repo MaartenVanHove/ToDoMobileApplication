@@ -3,14 +3,14 @@ class TodoList {
   final int collectionId;
   final String name;
   final String? imagePath;
-  final String colorHex;
+  final int colorId;
 
   TodoList({
     required this.id,
     required this.collectionId,
     required this.name,
     required this.imagePath,
-    required this.colorHex,
+    required this.colorId, 
   });
 
   factory TodoList.fromMap(Map<String, dynamic> map) {
@@ -19,7 +19,7 @@ class TodoList {
       collectionId: map['collection_id'],
       name: map['name'],
       imagePath: map['image_path'],
-      colorHex: map['color_hex'] ?? 'FF1E2F4D', // Default color if null
+      colorId: map['color_id'],
     );
   }
 
@@ -29,7 +29,7 @@ class TodoList {
       'collection_id': collectionId,
       'name': name,
       'image_path': imagePath,
-      'color_hex': colorHex,
+      'color_id': colorId,
     };
   }
 }

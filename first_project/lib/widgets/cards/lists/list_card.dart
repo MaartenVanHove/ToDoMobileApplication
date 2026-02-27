@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:first_project/providers/app_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ListCard extends StatelessWidget {
   final String listName;
   final String? imagePath;
-  final String colorHex;
+  final int colorId;
   final VoidCallback? onTap;
   final VoidCallback? onPressed;
   final int index;
@@ -13,7 +15,7 @@ class ListCard extends StatelessWidget {
     super.key,
     required this.listName,
     this.imagePath,
-    required this.colorHex,
+    required this.colorId,
     required this.onTap,
     required this.onPressed,
     required this.index,
@@ -24,6 +26,7 @@ class ListCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final dynamicWidth = screenWidth * 0.44; 
     final dynamicHeight = dynamicWidth * 0.9; 
+    final appController = context.watch<AppController>();
 
     return InkWell(
       onTap: onTap,
@@ -34,7 +37,7 @@ class ListCard extends StatelessWidget {
         height: dynamicHeight,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Color(int.parse(colorHex, radix: 16)), // Use the colorHex for background color
+          color: appController.getColorById(colorId),
           borderRadius: BorderRadius.circular(16),
           // 🖼️ THE FULL BACKGROUND IMAGE
           image: imagePath != null

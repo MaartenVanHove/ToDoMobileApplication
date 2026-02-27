@@ -15,11 +15,35 @@ class AppController extends ChangeNotifier {
   // Map<listId, List<Task>>
   Map<int, List<Task>> tasks = {};
 
+  // Global color palette loaded from DB
+  Map<int, String> colorPalette = {};
+
   final db = DatabaseServices.instance;
 
   AppController() {
     loadCollections();
+    loadColorPalette();
   }
+
+
+
+  Future<void> loadColorPalette() async {
+    final db = DatabaseServices.instance;
+    // You'll need to add getColors() to your DatabaseServices
+    final List<Map<String, dynamic>> maps = await db.getColors(); 
+    
+    colorPalette = {
+      for (var item in maps) item['id'] as int : item['hex_value'] as String
+    };
+
+    notifyListeners();
+  }
+
+  Color getColorById(int? colorId) {
+    final hex = colorPalette[colorId] ?? 'FF162238'; // Default fallback
+    return Color(int.parse(hex, radix: 16));
+  }
+
 
   // Load all collections from DB
   Future<void> loadCollections() async {
@@ -37,6 +61,7 @@ class AppController extends ChangeNotifier {
   // Load all lists for a given collection
   Future<void> loadLists(int collectionId) async {
     final listMaps = await db.getAllTodoLists(collectionId);
+    print('listMaps: $listMaps'); // Debug print to check the data structure
     lists[collectionId] =
         listMaps.map((e) => TodoList.fromMap(e)).toList();
 
@@ -81,17 +106,17 @@ class AppController extends ChangeNotifier {
   }
 
   // CREATE LIST inside a collection
-  Future<int> createList(String name, int collectionId, String? imagePath, String colorHex) async {
+  Future<int> createList(String name, int collectionId, String? imagePath, int colorId) async {
     // 1. Save to Database (Ensure DatabaseServices.addTodoList accepts imagePath)
-    final id = await db.addTodoList(imagePath, name, collectionId);
+    final id = await db.addTodoList(imagePath, name, collectionId, colorId);
     
     // 2. Create the model instance
     final newList = TodoList(
       id: id, 
       name: name, 
       collectionId: collectionId, 
-      imagePath: imagePath, // Make sure your TodoList model has this field
-      colorHex: colorHex,
+      imagePath: imagePath,
+      colorId: colorId,
     );
     
     // 3. Update local state
@@ -173,7 +198,7 @@ class AppController extends ChangeNotifier {
         collectionId: list.collectionId,
         name: name,
         imagePath: list.imagePath,
-        colorHex: list.colorHex,
+        colorId: list.colorId, 
       );
       notifyListeners();
     }
@@ -222,7 +247,7 @@ class AppController extends ChangeNotifier {
   }
 
   void updateListImage(TodoList list, String? imagePath) {
-    // TODO: add backend function to update list image.
+    db.updateListImage(list.id, imagePath);
     final collection = lists[list.collectionId]!;
     final index = collection.indexWhere((l) => l.id == list.id);
     if(index != -1) {
@@ -231,7 +256,7 @@ class AppController extends ChangeNotifier {
         collectionId: list.collectionId,
         name: list.name,
         imagePath: imagePath,
-        colorHex: list.colorHex,
+        colorId: list.colorId,
       );
       notifyListeners();
     }

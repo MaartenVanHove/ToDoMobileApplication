@@ -25,19 +25,9 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   final TextEditingController controller = TextEditingController();
   File? _imageFile;
 
-  // 🎨 COLOR STATE
-  Color _selectedColor = const Color(0xFF162238);
-
-  final List<Color> _colorPalette = [
-    const Color(0xFF162238), // Default Dark
-    const Color(0xFF3A7AFE), // Blue
-    const Color(0xFFE91E63), // Pink
-    const Color(0xFFFF9800), // Orange
-    const Color(0xFF4CAF50), // Green
-    const Color(0xFF9C27B0), // Purple
-    const Color(0xFF00BCD4), // Cyan
-    const Color(0xFF607D8B), // Steel
-  ];
+  // 🎨 COLOR STATE: Store the database ID, not the Color object
+  // Default to 1 (usually the first ID in SQLite)
+  int _selectedColorId = 1;
 
   // ---------------- IMAGE LOGIC ----------------
 
@@ -88,7 +78,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
 
   // ---------------- UI COMPONENTS ----------------
 
-  Widget _buildImagePickerSection() {
+  Widget _buildImagePickerSection(Color themeColor) {
     return GestureDetector(
       onTap: () => _showPickerOptions(context),
       child: AnimatedContainer(
@@ -96,13 +86,12 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          // Use the selected color as background if no image exists
-          color: _imageFile != null ? Colors.black : _selectedColor,
+          color: _imageFile != null ? Colors.black : themeColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10),
           boxShadow: [
             BoxShadow(
-              color: _selectedColor.withOpacity(0.2),
+              color: themeColor.withOpacity(0.2),
               blurRadius: 20,
               spreadRadius: 2,
             )
@@ -136,50 +125,68 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   }
 
   Widget _buildColorPickerSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Card Theme Color",
-          style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 55,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _colorPalette.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 15),
-            itemBuilder: (context, index) {
-              final color = _colorPalette[index];
-              final isSelected = _selectedColor == color;
+    // Use Consumer to listen to the palette from the database
+    return Consumer<AppController>(
+      builder: (context, appState, child) {
+        final paletteEntries = appState.colorPalette.entries.toList();
 
-              return GestureDetector(
-                onTap: () => setState(() => _selectedColor = color),
-                child: Container(
-                  width: 55,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? Colors.white : Colors.transparent,
-                      width: 3,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Card Theme Color",
+              style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 55,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: paletteEntries.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 15),
+                itemBuilder: (context, index) {
+                  final entry = paletteEntries[index];
+                  final int colorId = entry.key;
+                  final String hexValue = entry.value;
+
+                  // Parse the hex string from DB into a Color object
+                  final Color color = Color(int.parse(hexValue, radix: 16));
+                  final isSelected = _selectedColorId == colorId;
+
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedColorId = colorId),
+                    child: Container(
+                      width: 55,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? Colors.white : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                      child: isSelected 
+                          ? const Icon(Icons.check, color: Colors.white, size: 24) 
+                          : null,
                     ),
-                  ),
-                  child: isSelected 
-                      ? const Icon(Icons.check, color: Colors.white, size: 24) 
-                      : null,
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Use context.watch to rebuild when colorPalette is loaded/updated
+    final appState = context.watch<AppController>();
+    
+    // Helper to get the actual Color object for previewing UI elements
+    final selectedColor = appState.getColorById(_selectedColorId);
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),
       appBar: AppBar(
@@ -196,7 +203,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
             child: Column(
               children: [
-                _buildImagePickerSection(),
+                _buildImagePickerSection(selectedColor),
                 const SizedBox(height: 32),
                 _buildColorPickerSection(),
                 const SizedBox(height: 32),
@@ -215,12 +222,12 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: _selectedColor, width: 2),
+                      borderSide: BorderSide(color: selectedColor, width: 2),
                     ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                _buildCreateButton(),
+                _buildCreateButton(selectedColor),
               ],
             ),
           ),
@@ -229,20 +236,18 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     );
   }
 
-  Widget _buildCreateButton() {
+  Widget _buildCreateButton(Color selectedColor) {
     final appState = context.read<AppController>();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () => _saveNewList(context, appState),
         style: ElevatedButton.styleFrom(
-          backgroundColor: _selectedColor == const Color(0xFF162238) 
-              ? const Color(0xFF3A7AFE) 
-              : _selectedColor,
+          backgroundColor: selectedColor,
           padding: const EdgeInsets.symmetric(vertical: 20),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 10,
-          shadowColor: _selectedColor.withOpacity(0.5),
+          shadowColor: selectedColor.withOpacity(0.5),
         ),
         child: const Text(
           "Create List", 
@@ -268,20 +273,19 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
         final directory = await getApplicationDocumentsDirectory();
         final String fileName = "list_cover_${DateTime.now().millisecondsSinceEpoch}${p.extension(_imageFile!.path)}";
         final String newPath = p.join(directory.path, fileName);
-        final File savedImage = await _imageFile!.copy(newPath);
-        finalImagePath = savedImage.path;
+        await _imageFile!.copy(newPath);
+        finalImagePath = newPath;
       } catch (e) {
         debugPrint("Error saving image: $e");
-        finalImagePath = _imageFile?.path;
       }
     }
 
-    // Pass both the ImagePath and the Color (as an int) to the state
+    // Now correctly passing the selected DB ID to create the list
     final newListId = await appState.createList(
       input, 
       widget.collectionId, 
       finalImagePath,
-      _selectedColor.value.toRadixString(16).padLeft(8, '0'), // Convert color to hex string
+      _selectedColorId, 
     );
 
     if (mounted) {

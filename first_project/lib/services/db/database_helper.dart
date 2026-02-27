@@ -27,11 +27,19 @@ class DatabaseServices {
 
   Future<void> _createTables(Database db, int version) async {
     await db.execute('''
-    CREATE TABLE collection (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
-    )
+      CREATE TABLE colors (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        hex_value TEXT NOT NULL DEFAULT 'FF1E2F4D'
+      )
     ''');
+
+    await db.execute('''
+      CREATE TABLE collection (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      )
+      ''');
 
     await db.execute('''
         CREATE TABLE todo_lists (
@@ -39,7 +47,9 @@ class DatabaseServices {
           collection_id INTEGER NOT NULL,
           name TEXT NOT NULL,
           image_path TEXT,
+          color_id INTEGER,
           FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE
+          FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
         )
       ''');
 
@@ -54,15 +64,21 @@ class DatabaseServices {
       )
     ''');
 
-    await db.execute('''
-      CREATE TABLE colors (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        hex_value TEXT NOT NULL DEFAULT '#FFFFFF',
-        list_id INTEGER NOT NULL,
-        FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
-      )
-    ''');
+    // 2. Seed the standard colors
+    final List<Map<String, String>> standardColors = [
+      {'name': 'Dark', 'hex_value': 'FF162238'},
+      {'name': 'Blue', 'hex_value': 'FF3A7AFE'},
+      {'name': 'Pink', 'hex_value': 'FFE91E63'},
+      {'name': 'Orange', 'hex_value': 'FFFF9800'},
+      {'name': 'Green', 'hex_value': 'FF4CAF50'},
+      {'name': 'Purple', 'hex_value': 'FF9C27B0'},
+      {'name': 'Cyan', 'hex_value': 'FF00BCD4'},
+      {'name': 'Steel', 'hex_value': 'FF607D8B'},
+    ];
+
+    for (var color in standardColors) {
+      await db.insert('colors', color);
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -100,11 +116,38 @@ class DatabaseServices {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
           hex_value TEXT NOT NULL,
-          list_id INTEGER NOT NULL, 
           FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
         )
       ''');
+
+      await db.execute('''
+        ALTER TABLE todo_lists
+        ADD COLUMN color_id INTEGER,
+        ADD FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
+      ''');
+
+      // 2. Seed the standard colors
+      final List<Map<String, String>> standardColors = [
+        {'name': 'Dark', 'hex_value': 'FF162238'},
+        {'name': 'Blue', 'hex_value': 'FF3A7AFE'},
+        {'name': 'Pink', 'hex_value': 'FFE91E63'},
+        {'name': 'Orange', 'hex_value': 'FFFF9800'},
+        {'name': 'Green', 'hex_value': 'FF4CAF50'},
+        {'name': 'Purple', 'hex_value': 'FF9C27B0'},
+        {'name': 'Cyan', 'hex_value': 'FF00BCD4'},
+        {'name': 'Steel', 'hex_value': 'FF607D8B'},
+      ];
+
+      for (var color in standardColors) {
+        await db.insert('colors', color);
+      }
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getColors() async {
+    final db = await database;
+    // We order by ID to ensure the palette always appears in the same order in your UI
+    return await db.query('colors', orderBy: 'id ASC');
   }
 
   // CRUD FUNCTIONS
@@ -113,7 +156,7 @@ class DatabaseServices {
     return await db.insert('collection', {'name': name});
   }
 
-  Future<int> addTodoList(String? imagePath, String name, int collectionId) async {
+  Future<int> addTodoList(String? imagePath, String name, int collectionId, int colorId) async {
     final db = await database;
     return await db.insert(
       'todo_lists',
@@ -121,6 +164,7 @@ class DatabaseServices {
         'collection_id': collectionId,
         'name': name,
         'image_path': imagePath,
+        'color_id': colorId,
       },
     );
   }
@@ -146,18 +190,11 @@ class DatabaseServices {
 
   Future<List<Map<String, dynamic>>> getAllTodoLists(int collectionId) async {
     final db = await database;
-    
-    // We use a LEFT JOIN so that if a list somehow doesn't have a color yet, 
-    // it still shows up in your UI.
-    return await db.rawQuery('''
-      SELECT 
-        todo_lists.*, 
-        colors.hex_value, 
-        colors.name AS color_name
-      FROM todo_lists
-      LEFT JOIN colors ON todo_lists.id = colors.list_id
-      WHERE todo_lists.collection_id = ?
-    ''', [collectionId]);
+    return await db.query(
+      'todo_lists', 
+      where: 'collection_id = ?', 
+      whereArgs: [collectionId]
+    );
   }
 
   Future<List<Map<String, dynamic>>> getTasks(int listId) async {
