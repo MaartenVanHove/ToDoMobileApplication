@@ -1,50 +1,30 @@
-import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
-import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
-import 'package:first_project/screens/list/list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:first_project/models/collection.dart';
 
 class CollectionController extends ChangeNotifier {
-  
-  // void deleteCollection(BuildContext context, Collection collection) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (_) => ConfirmDialog(
-  //       title: "Delete ${collection.name}?",
-  //       message: "This will permanently remove everything inside.",
-  //       onConfirm: () => state.deleteCollection(collection.id),
-  //     ),
-  //   );
-  // }
+  String _searchQuery = "";
+  String get searchQuery => _searchQuery;
 
+  /// Filters and Sorts the collections list
+  List<Collection> getProcessedCollections(List<Collection> allCollections) {
+    // 1. Filter based on search
+    final filtered = allCollections.where((c) {
+      return c.name.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
 
-  // --- Navigation ---
-
-    void navigateToAddCollectionScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddNewCollectionScreen(),
-      )
-    );
+    // 2. Sort Alphabetically
+    filtered.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    
+    return filtered;
   }
 
-  void navigateToAddListScreen(BuildContext context, var collectionId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddNewListScreen(collectionId: collectionId,),
-      )
-    );
+  void updateSearch(String query) {
+    _searchQuery = query;
+    notifyListeners();
   }
 
-  void navigateToListScreen(BuildContext context, var listId, var listName) {
-    Navigator.push(
-      context,  
-      MaterialPageRoute(
-        builder: (_) => ListScreen(listId: listId, listName: listName,),
-      )
-    );
+  void clearSearch() {
+    _searchQuery = "";
+    notifyListeners();
   }
-
 }

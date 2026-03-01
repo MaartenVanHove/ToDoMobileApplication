@@ -1,4 +1,5 @@
 import 'package:first_project/screens/collections/collection_screen.dart';
+import 'package:first_project/screens/collections/collection_controller.dart'; // Add this import
 import 'package:first_project/providers/app_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppController(),
+    // USE MULTIPROVIDER TO INJECT BOTH CONTROLLERS
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppController()),
+        ChangeNotifierProvider(create: (_) => CollectionController()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Todo List',
@@ -25,14 +30,13 @@ class MyApp extends StatelessWidget {
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),
-          iconTheme: IconThemeData(color: Colors.white), 
+          iconTheme: const IconThemeData(color: Colors.white), 
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF3A7AFE),
           ),
           useMaterial3: true,
         ),
-
-        home: CollectionsScreen(),
+        home: const CollectionsScreen(),
       ),
     );
   }
