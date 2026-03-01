@@ -1,16 +1,16 @@
 import 'package:first_project/core/constants/app_strings.dart';
-import 'package:first_project/screens/list/widget_views/edit_action_bar.dart';
-import 'package:first_project/screens/list/widget_views/list_tool_bar.dart';
-import 'package:first_project/screens/list/widget_views/task_completedlist_section.dart';
-import 'package:first_project/screens/list/widget_views/task_input_field.dart';
-import 'package:first_project/screens/list/widget_views/task_todolist_section.dart';
-import 'package:first_project/screens/list/widget_views/title.dart';
+import 'package:first_project/screens/list_screen/widget_views/edit_action_bar.dart';
+import 'package:first_project/screens/list_screen/widget_views/list_tool_bar.dart';
+import 'package:first_project/screens/list_screen/widget_views/task_completedlist_section.dart';
+import 'package:first_project/screens/list_screen/widget_views/task_input_field.dart';
+import 'package:first_project/screens/list_screen/widget_views/task_todolist_section.dart';
+import 'package:first_project/screens/list_screen/widget_views/title.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:first_project/providers/app_controller.dart';
-import 'package:first_project/screens/list/list_controller.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
 
 class ListScreen extends StatefulWidget {
   final int listId;
