@@ -20,7 +20,7 @@ class CollectionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appController = context.watch<AppModel>();
     final collectionController = context.watch<CollectionController>();
-    final collections = collectionController.getProcessedCollections(appController.collections);
+    final collections = appController.collections;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),

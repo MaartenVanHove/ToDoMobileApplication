@@ -1,19 +1,16 @@
+import 'package:first_project/models/todo_list.dart';
 import 'package:flutter/material.dart';
-import 'package:first_project/models/collection.dart';
 
 class CollectionController extends ChangeNotifier {
   String _searchQuery = "";
   String get searchQuery => _searchQuery;
 
   /// Filters and Sorts the collections list
-  List<Collection> getProcessedCollections(List<Collection> allCollections) {
+  List<TodoList> getProcessedCollections(List<TodoList> allLists) {
     // 1. Filter based on search
-    final filtered = allCollections.where((c) {
+    final filtered = allLists.where((c) {
       return c.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
-
-    // 2. Sort Alphabetically
-    filtered.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     
     return filtered;
   }
