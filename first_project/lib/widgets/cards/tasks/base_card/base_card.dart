@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/model/app_model.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

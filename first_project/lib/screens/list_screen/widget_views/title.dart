@@ -2,8 +2,8 @@ import 'package:first_project/core/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:first_project/providers/app_controller.dart';
-import 'package:first_project/screens/list/list_controller.dart';
+import 'package:first_project/model/app_model.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
 
 class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
   final int listId;
@@ -17,7 +17,7 @@ class ListScreenTitle extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.read<AppController>();
+    final appState = context.read<AppModel>();
     final listController = context.watch<ListController>();
 
   return AppBar(

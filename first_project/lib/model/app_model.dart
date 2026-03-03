@@ -5,7 +5,7 @@ import 'package:first_project/models/todo_list.dart';
 import 'package:first_project/services/db/database_helper.dart';
 import 'package:flutter/material.dart';
 
-class AppController extends ChangeNotifier {
+class AppModel extends ChangeNotifier {
   // All collections
   List<Collection> collections = [];
 
@@ -20,11 +20,10 @@ class AppController extends ChangeNotifier {
 
   final db = DatabaseServices.instance;
 
-  AppController() {
+  AppModel() {
     loadCollections();
     loadColorPalette();
   }
-
 
 
   Future<void> loadColorPalette() async {

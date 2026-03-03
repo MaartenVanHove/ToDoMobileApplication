@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:first_project/core/theme/app_theme_colors.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -64,17 +65,12 @@ class DatabaseServices {
       )
     ''');
 
-    // 2. Seed the standard colors
-    final List<Map<String, String>> standardColors = [
-      {'name': 'Dark', 'hex_value': 'FF162238'},
-      {'name': 'Blue', 'hex_value': 'FF3A7AFE'},
-      {'name': 'Pink', 'hex_value': 'FFE91E63'},
-      {'name': 'Orange', 'hex_value': 'FFFF9800'},
-      {'name': 'Green', 'hex_value': 'FF4CAF50'},
-      {'name': 'Purple', 'hex_value': 'FF9C27B0'},
-      {'name': 'Cyan', 'hex_value': 'FF00BCD4'},
-      {'name': 'Steel', 'hex_value': 'FF607D8B'},
-    ];
+    final standardColors = AppThemeColors.palette.entries.map((entry) {
+      return {
+        'name': entry.key,
+        'hex_value': AppThemeColors.colorToHex(entry.value),
+      };
+    }).toList();
 
     for (var color in standardColors) {
       await db.insert('colors', color);
@@ -126,17 +122,12 @@ class DatabaseServices {
         ADD FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
       ''');
 
-      // 2. Seed the standard colors
-      final List<Map<String, String>> standardColors = [
-        {'name': 'Dark', 'hex_value': 'FF162238'},
-        {'name': 'Blue', 'hex_value': 'FF3A7AFE'},
-        {'name': 'Pink', 'hex_value': 'FFE91E63'},
-        {'name': 'Orange', 'hex_value': 'FFFF9800'},
-        {'name': 'Green', 'hex_value': 'FF4CAF50'},
-        {'name': 'Purple', 'hex_value': 'FF9C27B0'},
-        {'name': 'Cyan', 'hex_value': 'FF00BCD4'},
-        {'name': 'Steel', 'hex_value': 'FF607D8B'},
-      ];
+      final standardColors = AppThemeColors.palette.entries.map((entry) {
+        return {
+          'name': entry.key,
+          'hex_value': AppThemeColors.colorToHex(entry.value),
+        };
+      }).toList();
 
       for (var color in standardColors) {
         await db.insert('colors', color);

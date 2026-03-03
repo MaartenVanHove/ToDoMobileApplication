@@ -1,6 +1,6 @@
 import 'package:first_project/models/task.dart';
-import 'package:first_project/providers/app_controller.dart';
-import 'package:first_project/screens/list/list_controller.dart';
+import 'package:first_project/model/app_model.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/completed_card.dart'; // Ensure correct import
 import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class TaskCompletedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<AppController>();
+    final appState = context.read<AppModel>();
 
     return ListView.builder(
       shrinkWrap: true,

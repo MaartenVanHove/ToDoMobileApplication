@@ -22,7 +22,7 @@ class FilterBar extends StatelessWidget {
             child: TextField(
               onChanged: onChanged,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(hintText: 'Search collections...', hintStyle: TextStyle(color: Colors.white54), border: InputBorder.none),
+              decoration: const InputDecoration(hintText: 'Search collections/lists...', hintStyle: TextStyle(color: Colors.white54), border: InputBorder.none),
             ),
           ),
           if (searchQuery.isNotEmpty)

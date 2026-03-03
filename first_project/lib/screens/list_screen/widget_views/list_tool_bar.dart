@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:first_project/screens/list/list_controller.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
 import 'package:provider/provider.dart';
 
 class ListToolBar extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:first_project/screens/collections/collection_screen.dart';
-import 'package:first_project/screens/collections/collection_controller.dart'; // Add this import
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/screens/home_screen/collection_view.dart';
+import 'package:first_project/screens/home_screen/collection_controller.dart'; // Add this import
+import 'package:first_project/model/app_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     // USE MULTIPROVIDER TO INJECT BOTH CONTROLLERS
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppController()),
+        ChangeNotifierProvider(create: (_) => AppModel()),
         ChangeNotifierProvider(create: (_) => CollectionController()),
       ],
       child: MaterialApp(

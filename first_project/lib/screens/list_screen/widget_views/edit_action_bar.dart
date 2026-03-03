@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:first_project/screens/list/list_controller.dart';
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/model/app_model.dart';
 
 class EditActionBar extends StatelessWidget {
   final int listId;
@@ -11,7 +11,7 @@ class EditActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<AppController>();
+    final appState = context.read<AppModel>();
 
     final bool hasSelection = listController.selectedTaskIds.isNotEmpty;
 

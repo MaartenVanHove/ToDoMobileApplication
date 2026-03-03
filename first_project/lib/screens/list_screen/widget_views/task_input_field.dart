@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:first_project/screens/list/list_controller.dart';
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/model/app_model.dart';
 
 class TaskInputField extends StatelessWidget {
   final int listId;
@@ -13,7 +13,7 @@ class TaskInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     // .watch ensures the widget rebuilds when text or images change
     final listController = context.watch<ListController>();
-    final appState = context.read<AppController>();
+    final appState = context.read<AppModel>();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -113,7 +113,7 @@ class TaskInputField extends StatelessWidget {
     );
   }
 
-  Widget _buildAddButton(BuildContext context, ListController controller, AppController appState) {
+  Widget _buildAddButton(BuildContext context, ListController controller, AppModel appState) {
     return Container(
       // Padding ensures it matches the height profile of a single-line input bar
       margin: const EdgeInsets.only(bottom: 4), 

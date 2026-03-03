@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Your Imports
-import 'package:first_project/providers/app_controller.dart';
-import 'package:first_project/screens/collections/collection_controller.dart';
-import 'package:first_project/screens/collections/widget_views/filter_bar.dart';
-import 'package:first_project/screens/collections/widget_views/header.dart';
-import 'package:first_project/screens/collections/widget_views/collection_list_view.dart';
+import 'package:first_project/model/app_model.dart';
+import 'package:first_project/screens/home_screen/collection_controller.dart';
+import 'package:first_project/screens/home_screen/widget_views/filter_bar.dart';
+import 'package:first_project/screens/home_screen/widget_views/collection_header.dart';
+import 'package:first_project/screens/home_screen/widget_views/collection_list_view.dart';
 
-// Other Screens and Dialogs
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
-import 'package:first_project/screens/list/list_screen.dart';
+import 'package:first_project/screens/list_screen/list_view.dart';
 import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 
@@ -20,24 +18,23 @@ class CollectionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<AppController>();
-    final uiState = context.watch<CollectionController>();
-    final collections = uiState.getProcessedCollections(appState.collections);
+    final appController = context.watch<AppModel>();
+    final collectionController = context.watch<CollectionController>();
+    final collections = collectionController.getProcessedCollections(appController.collections);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),
       appBar: _buildAppBar(),
       
-      // 1. ADDED FLOATING ACTION BUTTON
       floatingActionButton: _buildFloatingActionButton(context),
       
       body: SafeArea(
         child: Column(
           children: [
             FilterBar(
-              searchQuery: uiState.searchQuery,
-              onChanged: uiState.updateSearch,
-              onClear: uiState.clearSearch,
+              searchQuery: collectionController.searchQuery,
+              onChanged: collectionController.updateSearch,
+              onClear: collectionController.clearSearch,
             ),
             const SizedBox(height: 6),
             Expanded(
@@ -50,16 +47,16 @@ class CollectionsScreen extends StatelessWidget {
                     children: [
                       CollectionHeader(
                         collection: col,
-                        onRename: () => _handleRename(context, appState, col),
+                        onRename: () => _handleRename(context, appController, col),
                         onAddList: () => _navigateToAddList(context, col.id),
-                        onDelete: () => _handleDelete(context, appState, col),
+                        onDelete: () => _handleDelete(context, appController, col),
                       ),
                       CollectionListView(
                         collectionId: col.id,
-                        appState: appState,
+                        appState: appController,
                         onNavigateToList: (id, idx) => _navigateToList(context, id, col.name),
                         onAddList: (id) => _navigateToAddList(context, id),
-                        onDeleteList: (cId, lId, name) => _handleDeleteList(context, appState, cId, lId, name),
+                        onDeleteList: (cId, lId, name) => _handleDeleteList(context, appController, cId, lId, name),
                       ),
                       const SizedBox(height: 32),
                     ],
@@ -89,7 +86,7 @@ class CollectionsScreen extends StatelessWidget {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF0A0F1F),
+      // backgroundColor: const Color(0xFF0A0F1F),
       elevation: 0,
       title: const Text('COLLECTIONS'),
       titleTextStyle: const TextStyle(
@@ -103,7 +100,7 @@ class CollectionsScreen extends StatelessWidget {
 
   // --- LOGIC HANDLERS (Rename, Delete, Navigation) ---
 
-  void _handleRename(BuildContext context, AppController appState, var collection) async {
+  void _handleRename(BuildContext context, AppModel appState, var collection) async {
     final newName = await showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -116,7 +113,7 @@ class CollectionsScreen extends StatelessWidget {
     }
   }
 
-  void _handleDelete(BuildContext context, AppController appState, var collection) {
+  void _handleDelete(BuildContext context, AppModel appState, var collection) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -128,14 +125,14 @@ class CollectionsScreen extends StatelessWidget {
     );
   }
 
-  void _handleDeleteList(BuildContext context, AppController appState, int collectionId, int listId, String listName) {
+  void _handleDeleteList(BuildContext context, AppModel appModel, int collectionId, int listId, String listName) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => ConfirmDialog(
         title: "Delete $listName?",
         message: "This will permanently remove the list.",
-        onConfirm: () => appState.deleteList(collectionId, listId),
+        onConfirm: () => appModel.deleteList(collectionId, listId),
       ),
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/model/app_model.dart';
 import 'package:first_project/widgets/cards/lists/list_card.dart';
 import 'package:first_project/widgets/cards/lists/add_list_card.dart';
 
 class CollectionListView extends StatelessWidget {
   final int collectionId;
-  final AppController appState;
+  final AppModel appState;
   final Function(int, int) onNavigateToList;
   final Function(int) onAddList;
   final Function(int, int, String) onDeleteList;
@@ -24,7 +24,7 @@ class CollectionListView extends StatelessWidget {
     final lists = appState.lists[collectionId] ?? [];
     return SizedBox(
       height: 180,
-      child: ListView.builder( // Simplified from Reorderable for clarity in modularizing
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: lists.length + 1,

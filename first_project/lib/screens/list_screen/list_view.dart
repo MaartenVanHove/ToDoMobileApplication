@@ -9,7 +9,7 @@ import 'package:first_project/screens/list_screen/widget_views/title.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/model/app_model.dart';
 import 'package:first_project/screens/list_screen/list_controller.dart';
 
 class ListScreen extends StatefulWidget {
@@ -30,9 +30,9 @@ class _ListScreenState extends State<ListScreen> {
   @override
   void initState() {
     super.initState();
-    // Laden van taken blijft hetzelfde
+
     Future.microtask(() {
-      context.read<AppController>().loadTasks(widget.listId);
+      context.read<AppModel>().loadTasks(widget.listId);
     });
   }
 
@@ -40,7 +40,7 @@ class _ListScreenState extends State<ListScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ListController(),
-      child: Consumer2<AppController, ListController>(
+      child: Consumer2<AppModel, ListController>(
         builder: (context, appState, listController, child) {
           final allTasks = appState.tasks[widget.listId] ?? [];
           final todoTasks = allTasks.where((task) => !task.isFinished).toList();

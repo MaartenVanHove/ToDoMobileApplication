@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:first_project/providers/app_controller.dart';
+import 'package:first_project/model/app_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,7 @@ class ListCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final dynamicWidth = screenWidth * 0.44; 
     final dynamicHeight = dynamicWidth * 0.9; 
-    final appController = context.watch<AppController>();
+    final appController = context.watch<AppModel>();
 
     return InkWell(
       onTap: onTap,

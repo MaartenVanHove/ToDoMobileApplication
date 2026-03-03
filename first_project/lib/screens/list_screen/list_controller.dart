@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import '../../providers/app_controller.dart';
+import '../../model/app_model.dart';
 import '../../services/media/image_service.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,7 +23,7 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stopEditingTitle(AppController appController, int listId) {
+  void stopEditingTitle(AppModel appController, int listId) {
     final newName = titleEditController.text.trim();
     if (newName.isNotEmpty) {
       final list = appController.getListById(listId);
@@ -50,7 +50,7 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateListImage(AppController appController, int listId, ImageSource source) async {
+  Future<void> updateListImage(AppModel appController, int listId, ImageSource source) async {
     final pickedFile = await ImageService.pickImage(source);
     if (pickedFile != null) {
       final list = appController.getListById(listId);
@@ -94,7 +94,7 @@ class ListController extends ChangeNotifier {
   }
 
   // --- Database Actions ---
-  Future<void> saveTask(AppController appController, int listId) async {
+  Future<void> saveTask(AppModel appController, int listId) async {
     final name = textController.text.trim();
     if (name.isEmpty) return;
 
@@ -117,7 +117,7 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteSelected(AppController appController, int listId) {
+  void deleteSelected(AppModel appController, int listId) {
     for (var id in selectedTaskIds) {
       appController.deleteTask(listId, id);
     }

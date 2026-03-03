@@ -5,8 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:image_picker/image_picker.dart';
 
-import 'package:first_project/providers/app_controller.dart';
-import 'package:first_project/screens/list/list_screen.dart';
+import 'package:first_project/model/app_model.dart';
+import 'package:first_project/screens/list_screen/list_view.dart';
 import 'package:first_project/services/media/image_service.dart';
 
 class AddNewListScreen extends StatefulWidget {
@@ -126,7 +126,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
 
   Widget _buildColorPickerSection() {
     // Use Consumer to listen to the palette from the database
-    return Consumer<AppController>(
+    return Consumer<AppModel>(
       builder: (context, appState, child) {
         final paletteEntries = appState.colorPalette.entries.toList();
 
@@ -182,7 +182,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   @override
   Widget build(BuildContext context) {
     // Use context.watch to rebuild when colorPalette is loaded/updated
-    final appState = context.watch<AppController>();
+    final appState = context.watch<AppModel>();
     
     // Helper to get the actual Color object for previewing UI elements
     final selectedColor = appState.getColorById(_selectedColorId);
@@ -237,7 +237,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   }
 
   Widget _buildCreateButton(Color selectedColor) {
-    final appState = context.read<AppController>();
+    final appState = context.read<AppModel>();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -257,7 +257,7 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
     );
   }
 
-  Future<void> _saveNewList(BuildContext context, AppController appState) async {
+  Future<void> _saveNewList(BuildContext context, AppModel appState) async {
     final input = controller.text.trim();
     if (input.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
