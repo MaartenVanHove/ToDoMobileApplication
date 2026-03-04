@@ -6,8 +6,8 @@ class CollectionController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
 
   /// Filters and Sorts the collections list
-  List<TodoList> getProcessedCollections(List<TodoList> allLists) {
-    // 1. Filter based on search
+  List<TodoList> getProcessedLists(List<TodoList> allLists) {
+    // Filter based on search
     final filtered = allLists.where((c) {
       return c.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();

@@ -27,7 +27,7 @@ class CollectionListView extends StatelessWidget {
     final collectionController = context.watch<CollectionController>();
 
     final allLists = appController.lists.values.expand((list) => list).toList();
-    final processedLists = collectionController.getProcessedCollections(allLists);
+    final processedLists = collectionController.getProcessedLists(allLists);
     final displayLists = processedLists.where((l) => l.collectionId == collectionId).toList();
 
     return SizedBox(

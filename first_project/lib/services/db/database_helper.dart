@@ -28,6 +28,23 @@ class DatabaseServices {
 
   Future<void> _createTables(Database db, int version) async {
     await db.execute('''
+      CREATE TABLE tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE list_tags (
+        list_id INTEGER NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY (list_id, tag_id),
+        FOREIGN KEY (list_id) REFERENCES todo_lists(id) ON DELETE CASCADE,
+        FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
       CREATE TABLE colors (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -40,19 +57,20 @@ class DatabaseServices {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
       )
-      ''');
+    ''');
 
+    // Added: Added missing commas between columns and foreign keys
     await db.execute('''
-        CREATE TABLE todo_lists (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          collection_id INTEGER NOT NULL,
-          name TEXT NOT NULL,
-          image_path TEXT,
-          color_id INTEGER,
-          FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE
-          FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
-        )
-      ''');
+      CREATE TABLE todo_lists (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        collection_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        image_path TEXT,
+        color_id INTEGER,
+        FOREIGN KEY(collection_id) REFERENCES collection(id) ON DELETE CASCADE,
+        FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
+      )
+    ''');
 
     await db.execute('''
       CREATE TABLE tasks (
@@ -132,6 +150,10 @@ class DatabaseServices {
       for (var color in standardColors) {
         await db.insert('colors', color);
       }
+    }
+
+    if(oldVersion < 6) {
+
     }
   }
 
@@ -283,4 +305,65 @@ class DatabaseServices {
       whereArgs: [id]
     );
   }
+
+  // -------------------- TAG MANAGEMENT --------------------
+
+  Future<int> addTag(String name) async {
+    final db = await database;
+    return await db.insert('tags', {'name' : name});
+  }
+
+  Future<List<Map<String, dynamic>>> getAllTags() async {
+    final db = await database;
+    return await db.query('tags', orderBy: 'name ASC');
+  }
+
+  Future<void> updateTag(int id, String newName) async {
+    final db = await database;
+    await db.update('tags', {'name': newName}, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> deleteTag(int id) async {
+    final db = await database;
+    await db.delete('tags', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> attachListAndTag(int listId, int tagId) async {
+    final db = await database;
+    await db.insert('list_tags', {
+        'list_id': listId,
+        'tag_id': tagId,
+      }, conflictAlgorithm: ConflictAlgorithm.ignore // prevent duplicates.
+    );
+  }
+
+  Future<void> detachTagToList(int listId, int tagId) async {
+    final db = await database;
+    await db.delete('list_tags', 
+      where: 'list_id = ? AND tag_id = ?', 
+      whereArgs: [listId, tagId]
+    );
+  }
+
+
+  // ------------- RELATIONSHIP QUERIES -------------
+
+  Future<List<Map<String, dynamic>>> getTagsFromList(int listId) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT tags.* FROM tags
+      INNER JOIN list_tags ON tags.id = list_tags.tag_id
+      WHERE list_tags.list_id = ?
+    ''', [listId]);
+  }
+
+  Future<List<Map<String, dynamic>>> getListsByTag(int tagId) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT todo_lists.* FROM todo_lists
+      INNER JOIN list_tags ON todo_lists.id = list_tags.list_id
+      WHERE list_tags.tag_id = ?
+    ''', [tagId]);
+  }
+
 }
