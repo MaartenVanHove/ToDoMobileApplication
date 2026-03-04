@@ -1,21 +1,19 @@
-// lib/providers/app_state.dart
 import 'package:first_project/models/collection.dart';
+import 'package:first_project/models/tag.dart';
 import 'package:first_project/models/task.dart';
 import 'package:first_project/models/todo_list.dart';
 import 'package:first_project/services/db/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class AppModel extends ChangeNotifier {
-  // All collections
+  
   List<Collection> collections = [];
+  Map<int, List<TodoList>> lists = {}; // int represent collectionId
+  Map<int, List<Task>> tasks = {}; // int represent listId
 
-  // Map<collectionId, List<TodoList>>
-  Map<int, List<TodoList>> lists = {};
+  List<Tagg> taggs = [];
 
-  // Map<listId, List<Task>>
-  Map<int, List<Task>> tasks = {};
-
-  // Global color palette loaded from DB
+  // Standard color palet.
   Map<int, String> colorPalette = {};
 
   final db = DatabaseServices.instance;
@@ -43,13 +41,16 @@ class AppModel extends ChangeNotifier {
     return Color(int.parse(hex, radix: 16));
   }
 
+  Future<void> loadTags() async {
+    final taggMaps = await db.getAllTags();
+    taggs = taggMaps.map((t) => Tagg.fromMap(t)).toList();
+  }
 
-  // Load all collections from DB
   Future<void> loadCollections() async {
     final collectionMaps = await db.getAllCollections();
     collections = collectionMaps.map((e) => Collection.fromMap(e)).toList();
 
-    // Load lists for each collection
+    // Load lists for each collection    
     for (var collection in collections) {
       await loadLists(collection.id);
     }
@@ -57,7 +58,6 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Load all lists for a given collection
   Future<void> loadLists(int collectionId) async {
     final listMaps = await db.getAllTodoLists(collectionId);
     print('listMaps: $listMaps'); // Debug print to check the data structure
@@ -81,14 +81,12 @@ class AppModel extends ChangeNotifier {
   return null; // not found
 }
 
-  // Load tasks for a given list
   Future<void> loadTasks(int listId) async {
     final taskMaps = await db.getTasks(listId);
     tasks[listId] = taskMaps.map((e) => Task.fromMap(e)).toList();
     notifyListeners();
   }
 
-  // CREATE COLLECTION
   Future<int> createCollection(String name) async {
     final id = await db.addCollection(name);
     collections.add(Collection(id: id, name: name));
@@ -96,7 +94,6 @@ class AppModel extends ChangeNotifier {
     return id;
   }
 
-  // DELETE COLLECTION
   Future<void> deleteCollection(int collectionId) async {
     await db.deleteCollection(collectionId);
     collections.removeWhere((c) => c.id == collectionId);
@@ -104,7 +101,6 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // CREATE LIST inside a collection
   Future<int> createList(String name, int collectionId, String? imagePath, int colorId) async {
     // 1. Save to Database (Ensure DatabaseServices.addTodoList accepts imagePath)
     final id = await db.addTodoList(imagePath, name, collectionId, colorId);
@@ -118,7 +114,7 @@ class AppModel extends ChangeNotifier {
       colorId: colorId,
     );
     
-    // 3. Update local state
+    // Update local state
     lists.putIfAbsent(collectionId, () => []);
     lists[collectionId]!.insert(0, newList);
     tasks[id] = [];
@@ -127,7 +123,6 @@ class AppModel extends ChangeNotifier {
     return id;
   }
 
-  // DELETE LIST
   Future<void> deleteList(int collectionId, int listId) async {
     await db.deleteTodoList(listId);
     lists[collectionId]?.removeWhere((list) => list.id == listId);
@@ -135,7 +130,6 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // CREATE TASK
   Future<int> addTask(int listId, String name, String? imagePath) async {
     final taskId = await db.addTask(imagePath, listId, name);
     final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false, imagePath: imagePath);
@@ -145,14 +139,12 @@ class AppModel extends ChangeNotifier {
     return taskId;
   }
 
-  // DELETE TASK
   Future<void> deleteTask(int listId, int taskId) async {
     await db.deleteTask(taskId); // Make sure you add this method in DB
     tasks[listId]?.removeWhere((t) => t.id == taskId);
     notifyListeners();
   }
 
-  // TOGGLE TASK FINISHED
   Future<void> toggleTaskFinished(Task task) async {
     await db.updateTaskFinished(task.id, !task.isFinished);
     final list = tasks[task.listId]!;
@@ -169,7 +161,6 @@ class AppModel extends ChangeNotifier {
     }
   }
 
-  // UPDATE TASK NAME
   Future<void> updateTaskName(Task task, String name) async {
     db.updateTaskName(task.id, name);
     final list = tasks[task.listId]!;
@@ -186,7 +177,6 @@ class AppModel extends ChangeNotifier {
     }
   }
 
-  // UPDATE LIST NAME
   Future<void> updateListName(TodoList list, String name) async {
     db.updateListName(list.id, name);
     final collection = lists[list.collectionId]!;
@@ -203,7 +193,6 @@ class AppModel extends ChangeNotifier {
     }
   }
 
-    // UPDATE COLLECTION NAME
   Future<void> updateCollectionName(Collection collection, String name) async {
     db.updateCollectionName(collection.id, name);
     final index = collections.indexWhere((c) => c.id == collection.id);
