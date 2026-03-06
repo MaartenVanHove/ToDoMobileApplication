@@ -223,7 +223,8 @@ class AppModel extends ChangeNotifier {
         collectionId: list.collectionId,
         name: name,
         imagePath: list.imagePath,
-        colorId: list.colorId, 
+        colorId: list.colorId,
+        tags: list.tags,  
       );
       notifyListeners();
     }
