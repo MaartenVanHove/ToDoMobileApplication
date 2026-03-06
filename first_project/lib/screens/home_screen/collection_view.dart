@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:first_project/model/app_model.dart';
 import 'package:first_project/screens/home_screen/collection_controller.dart';
 import 'package:first_project/screens/home_screen/widget_views/filter_bar.dart';
 import 'package:first_project/screens/home_screen/widget_views/collection_header.dart';
 import 'package:first_project/screens/home_screen/widget_views/collection_list_view.dart';
-
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list_screen/list_view.dart';
@@ -20,29 +18,31 @@ class CollectionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appController = context.watch<AppModel>();
     final collectionController = context.watch<CollectionController>();
-    final collections = appController.collections;
 
-    int? _selectedTagId; // In your Screen State
+    final allLists = appController.lists; 
+    final filteredListsMap = collectionController.getFilteredListsMap(allLists);
+
+    // Sort the collections based on the number of lists in each
+    final sortedCollections = collectionController.sortCollection(
+      appController.collections, 
+      filteredListsMap 
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),
       appBar: _buildAppBar(),
-      
       floatingActionButton: _buildFloatingActionButton(context),
-      
       body: SafeArea(
         child: Column(
           children: [
-            FilterBar(
-
-            ),
+            const FilterBar(),
             const SizedBox(height: 6),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.only(top: 16, bottom: 100), // Added padding for FAB clearance
-                itemCount: collections.length,
+                padding: const EdgeInsets.only(top: 16, bottom: 100),
+                itemCount: sortedCollections.length,
                 itemBuilder: (context, index) {
-                  final col = collections[index];
+                  final col = sortedCollections[index];
                   return Column(
                     children: [
                       CollectionHeader(
@@ -69,6 +69,12 @@ class CollectionsScreen extends StatelessWidget {
       ),
     );
   }
+
+  // --- UI PIECES & HANDLERS ---
+  // (Keep your existing _buildAppBar, _buildFloatingActionButton, 
+  // _handleRename, _handleDelete, _handleDeleteList, 
+  // _navigateToAddCollection, _navigateToAddList, _navigateToList methods here)
+
 
   // --- UI PIECES (FAB & APPBAR) ---
 

@@ -1,3 +1,4 @@
+import 'package:first_project/models/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:first_project/models/todo_list.dart';
 
@@ -48,8 +49,51 @@ class CollectionController extends ChangeNotifier {
     final currentListTags = list.tags;
     final currentListTagIds = currentListTags.map((t) => t.id).toList();
 
-    // 3. Check if every selected filter ID exists in the list's own IDs
     print('ListId: ${list.id} ListTags: ${list.tags} SelectedTags: ${_selectedTagIds}');
-    return _selectedTagIds.every((filterId) => currentListTagIds.contains(filterId));
+    return _selectedTagIds.any((filterId) => currentListTagIds.contains(filterId));
   }
+
+  List<Collection> sortCollection(
+    List<Collection> collections,
+    Map<int, List<TodoList>> allListsMap
+  ) {
+    // Create a copy to avoid mutating the original list
+    List<Collection> sorted = List.from(collections);
+
+    if(_selectedTagIds.isEmpty) return sorted;
+    
+    sorted.sort((a, b) {
+      // Get the count for each collection, default to 0 if none found
+      final countA = allListsMap[a.id]?.length ?? 0;
+      final countB = allListsMap[b.id]?.length ?? 0;
+      
+      // Sort descending (highest count first)
+      return countB.compareTo(countA);
+    });
+    
+    return sorted;
+  }
+
+  Map<int, List<TodoList>> getFilteredListsMap(Map<int, List<TodoList>> allListsMap) {
+    final Map<int, List<TodoList>> filteredMap = {};
+
+    // Iterate through each collection entry in the map
+    for (var entry in allListsMap.entries) {
+      int collectionId = entry.key;
+      List<TodoList> listsInCollection = entry.value;
+
+      // Filter the lists within this specific collection
+      final filteredLists = listsInCollection.where((list) {
+        return _matchesSearchBar(list) && _matchesTags(list);
+      }).toList();
+
+      // Only add the collection to the map if it has lists remaining after filtering
+      if (filteredLists.isNotEmpty) {
+        filteredMap[collectionId] = filteredLists;
+      }
+    }
+
+    return filteredMap;
+  }
+  
 }
