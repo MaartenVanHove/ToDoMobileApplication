@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ChangeNameDialog extends StatelessWidget {
+class InputDialog extends StatelessWidget {
   final String title;
+  final String? hint;
 
-  ChangeNameDialog({
+  InputDialog({
     super.key,
     required this.title,
+    this.hint,
   });
 
   final TextEditingController _controller = TextEditingController();
@@ -36,7 +38,7 @@ class ChangeNameDialog extends StatelessWidget {
               controller: _controller,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: "Enter new name",
+                labelText: hint != null ? hint : null,
                 labelStyle: const TextStyle(color: Colors.white54),
                 filled: true,
                 fillColor: const Color(0xFF162238),

@@ -75,7 +75,7 @@ class TaskInputField extends StatelessWidget {
                     // -----------------------
 
                     // This ensures the camera icon toggles visibility as you type
-                    onChanged: (text) => listController.notifyListeners(), 
+                    onChanged: (text) => () {}, 
                     
                     decoration: InputDecoration(
                       hintText: 'Enter new Task...',

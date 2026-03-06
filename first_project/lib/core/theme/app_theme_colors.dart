@@ -6,6 +6,7 @@ class AppThemeColors {
   static const Color surface = Color(0xFF162238);
   static const Color accent = Color(0xFF3A7AFE);
 
+  // New colors are only available after a new db update has been released.
   static const Map<String, Color> palette = {
     'Dark': Color(0xFF162238),
     'Blue': Color(0xFF3A7AFE),
@@ -15,7 +16,7 @@ class AppThemeColors {
     'Purple': Color(0xFF9C27B0),
     'Cyan': Color(0xFF00BCD4),
     'Steel': Color(0xFF607D8B),
-    'Omri':Color(0xFFB00020),
+    'Omri':Color(0xFFB00020), // Version 6.
   };
 
   static String colorToHex(Color color) {

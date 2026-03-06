@@ -11,7 +11,7 @@ class AppModel extends ChangeNotifier {
   Map<int, List<TodoList>> lists = {}; // int represent collectionId
   Map<int, List<Task>> tasks = {}; // int represent listId
 
-  List<Tagg> taggs = [];
+  List<Tag> tags = [];
 
   // Standard color palet.
   Map<int, String> colorPalette = {};
@@ -19,8 +19,10 @@ class AppModel extends ChangeNotifier {
   final db = DatabaseServices.instance;
 
   AppModel() {
-    loadCollections();
+    loadTags();
     loadColorPalette();
+    loadCollections();
+    print("ALL TAGGS: " + tags.toString());
   }
 
 
@@ -43,7 +45,30 @@ class AppModel extends ChangeNotifier {
 
   Future<void> loadTags() async {
     final taggMaps = await db.getAllTags();
-    taggs = taggMaps.map((t) => Tagg.fromMap(t)).toList();
+    tags = taggMaps.map((t) => Tag.fromMap(t)).toList();
+  }
+
+  Future<int> createTag(String name) async {
+    final cleanName = name.trim();
+    
+    final existingTag = tags.where(
+      (t) => t.name.toLowerCase() == cleanName.toLowerCase()
+    );
+
+    if (existingTag.isNotEmpty) {
+      return existingTag.first.id; // Return the ID of the one we already have
+    }
+
+    // If not, save to DB
+    final id = await db.addTag(cleanName);
+    
+    if (id != -1 && id != 0) {
+      tags.add(Tag.Tag(id: id, name: cleanName));
+      tags.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      notifyListeners();
+    }
+    
+    return id;
   }
 
   Future<void> loadCollections() async {
@@ -60,15 +85,26 @@ class AppModel extends ChangeNotifier {
 
   Future<void> loadLists(int collectionId) async {
     final listMaps = await db.getAllTodoLists(collectionId);
-    print('listMaps: $listMaps'); // Debug print to check the data structure
-    lists[collectionId] =
-        listMaps.map((e) => TodoList.fromMap(e)).toList();
+    
+    List<TodoList> hydratedLists = [];
 
-    // Load tasks for each list in this collection
-    for (var list in lists[collectionId]!) {
-      await loadTasks(list.id);
+    for (var map in listMaps) {
+      int listId = map['id'];
+      
+      // FETCH THE TAGS from the DB for this specific list
+      final tagMaps = await db.getTagsFromList(listId);
+      final tagsForThisList = tagMaps.map((t) => Tag.fromMap(t)).toList();
+      
+      // Create the TodoList with the fetched tags
+      final list = TodoList.fromMap(map, tags: tagsForThisList);
+      hydratedLists.add(list);
+
+      await loadTasks(listId);
     }
 
+    // 5. Update the state
+    lists[collectionId] = hydratedLists;
+    
     notifyListeners();
   }
 

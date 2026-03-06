@@ -2,7 +2,7 @@ import 'package:first_project/models/task.dart';
 import 'package:first_project/model/app_model.dart';
 import 'package:first_project/screens/list_screen/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/completed_card.dart'; // Ensure correct import
-import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
+import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,7 +57,7 @@ class TaskCompletedListView extends StatelessWidget {
               final newName = await showDialog<String>(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => ChangeNameDialog(
+                builder: (_) => InputDialog(
                   title: "Change '${task.name}' name",
                 ),
               );

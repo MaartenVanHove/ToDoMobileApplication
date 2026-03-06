@@ -2,7 +2,7 @@ import 'package:first_project/models/task.dart';
 import 'package:first_project/model/app_model.dart';
 import 'package:first_project/screens/list_screen/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/todo_card.dart';
-import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
+import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +60,7 @@ class TaskListView extends StatelessWidget {
             onTapUpdateName: () async {
               final newName = await showDialog<String>(
                 context: context,
-                builder: (_) => ChangeNameDialog(title: "Change '${task.name}' name"),
+                builder: (_) => InputDialog(title: "Change '${task.name}' name"),
               );
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName.trim());

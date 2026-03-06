@@ -1,14 +1,14 @@
-class Tagg {
+class Tag {
   final int id;
   final String name;
 
-  Tagg({
+  Tag.Tag({
     required this.id,
     required this.name,
   });
 
-  factory Tagg.fromMap(Map<String, dynamic> map) {
-    return Tagg(
+  factory Tag.fromMap(Map<String, dynamic> map) {
+    return Tag.Tag(
       id: map['id'],
       name: map['name'],
     );

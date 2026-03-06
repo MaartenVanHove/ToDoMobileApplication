@@ -10,7 +10,7 @@ import 'package:first_project/screens/home_screen/widget_views/collection_list_v
 import 'package:first_project/screens/add_screens/collection/add_new_collection.dart';
 import 'package:first_project/screens/add_screens/list/add_new_list_screen.dart';
 import 'package:first_project/screens/list_screen/list_view.dart';
-import 'package:first_project/widgets/dialogs/change_task_name_dialog.dart';
+import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:first_project/widgets/dialogs/confirm_dialog.dart';
 
 class CollectionsScreen extends StatelessWidget {
@@ -22,6 +22,8 @@ class CollectionsScreen extends StatelessWidget {
     final collectionController = context.watch<CollectionController>();
     final collections = appController.collections;
 
+    int? _selectedTagId; // In your Screen State
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1F),
       appBar: _buildAppBar(),
@@ -32,9 +34,7 @@ class CollectionsScreen extends StatelessWidget {
         child: Column(
           children: [
             FilterBar(
-              searchQuery: collectionController.searchQuery,
-              onChanged: collectionController.updateSearch,
-              onClear: collectionController.clearSearch,
+
             ),
             const SizedBox(height: 6),
             Expanded(
@@ -104,7 +104,7 @@ class CollectionsScreen extends StatelessWidget {
     final newName = await showDialog<String>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => ChangeNameDialog(
+      builder: (_) => InputDialog(
         title: "Change '${collection.name}' title",
       ),
     );

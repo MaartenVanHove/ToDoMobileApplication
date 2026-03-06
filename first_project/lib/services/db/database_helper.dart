@@ -20,7 +20,7 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 5, // Newest version is 5 to include colors table
+      version: 7, // Newest version is 7 (tag system)
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -30,7 +30,7 @@ class DatabaseServices {
     await db.execute('''
       CREATE TABLE tags (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL UNIQUE
       )
     ''');
 
@@ -98,48 +98,38 @@ class DatabaseServices {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('''
-        CREATE TABLE collection (
+        CREATE TABLE IF NOT EXISTS collection (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL
         )
       ''');
 
-      await db.execute('''
-        ALTER TABLE todo_lists
-        ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0
-      ''');
+      // Safe way to add column if it doesn't exist
+      await db.execute('ALTER TABLE todo_lists ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0');
     }
 
     if (oldVersion < 3) {
-      await db.execute('''
-        ALTER TABLE todo_lists 
-        ADD COLUMN image_path TEXT
-      ''');
+      await db.execute('ALTER TABLE todo_lists ADD COLUMN image_path TEXT');
     }
 
     if (oldVersion < 4) {
-      await db.execute('''
-        ALTER TABLE tasks 
-        ADD COLUMN image_path TEXT
-      ''');
+      await db.execute('ALTER TABLE tasks ADD COLUMN image_path TEXT');
     }
 
-    if(oldVersion < 5) {
+    if (oldVersion < 5) {
+      // 1. Create colors table (Notice: No list_id foreign key here, colors are independent)
       await db.execute('''
-        CREATE TABLE colors (
+        CREATE TABLE IF NOT EXISTS colors (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
-          hex_value TEXT NOT NULL,
-          FOREIGN KEY(list_id) REFERENCES todo_lists(id) ON DELETE CASCADE
+          hex_value TEXT NOT NULL DEFAULT 'FF1E2F4D'
         )
       ''');
 
-      await db.execute('''
-        ALTER TABLE todo_lists
-        ADD COLUMN color_id INTEGER,
-        ADD FOREIGN KEY(color_id) REFERENCES colors(id) ON DELETE CASCADE
-      ''');
+      // 2. Add color_id to todo_lists
+      await db.execute('ALTER TABLE todo_lists ADD COLUMN color_id INTEGER DEFAULT 1');
 
+      // 3. Seed the colors
       final standardColors = AppThemeColors.palette.entries.map((entry) {
         return {
           'name': entry.key,
@@ -152,8 +142,29 @@ class DatabaseServices {
       }
     }
 
-    if(oldVersion < 6) {
+    if (oldVersion < 6) {
+      // Ensure the tags and list_tags tables exist if they weren't created in onCreate
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS tags (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL
+        )
+      ''');
 
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS list_tags (
+          list_id INTEGER NOT NULL,
+          tag_id INTEGER NOT NULL,
+          PRIMARY KEY (list_id, tag_id),
+          FOREIGN KEY (list_id) REFERENCES todo_lists(id) ON DELETE CASCADE,
+          FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        )
+      ''');
+    }
+
+    if (oldVersion < 7) {
+      // This creates a unique constraint on the name column of the existing tags table
+      await db.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_tags_name ON tags (name)');
     }
   }
 
@@ -310,7 +321,10 @@ class DatabaseServices {
 
   Future<int> addTag(String name) async {
     final db = await database;
-    return await db.insert('tags', {'name' : name});
+    return await db.insert('tags', 
+      {'name' : name.trim()},
+      conflictAlgorithm: ConflictAlgorithm.ignore
+    );
   }
 
   Future<List<Map<String, dynamic>>> getAllTags() async {
