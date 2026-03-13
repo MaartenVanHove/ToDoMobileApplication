@@ -14,7 +14,6 @@ class ListController extends ChangeNotifier {
   late TextEditingController titleEditController;
   final Set<int> selectedTaskIds = {};
 
-
   // --- Title Modify Logic ---
 
   void startEditingTitle(String currentTitle) {
@@ -50,7 +49,11 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateListImage(AppModel appController, int listId, ImageSource source) async {
+  Future<void> updateListImage(
+    AppModel appController,
+    int listId,
+    ImageSource source,
+  ) async {
     final pickedFile = await ImageService.pickImage(source);
     if (pickedFile != null) {
       final list = appController.getListById(listId);
@@ -59,7 +62,6 @@ class ListController extends ChangeNotifier {
       }
     }
   }
-
 
   // --- Edit Mode Logic ---
 
@@ -102,7 +104,8 @@ class ListController extends ChangeNotifier {
     if (imageFile != null) {
       try {
         final directory = await getApplicationDocumentsDirectory();
-        final fileName = "task_${DateTime.now().millisecondsSinceEpoch}${p.extension(imageFile!.path)}";
+        final fileName =
+            "task_${DateTime.now().millisecondsSinceEpoch}${p.extension(imageFile!.path)}";
         final String newPath = p.join(directory.path, fileName);
         final File savedImage = await imageFile!.copy(newPath);
         savedPath = savedImage.path;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:first_project/model/app_model.dart';
 
 class EditActionBar extends StatelessWidget {
@@ -18,7 +18,7 @@ class EditActionBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       // Background color matches your theme
-      color: const Color(0xFF0A0F1F), 
+      color: const Color(0xFF0A0F1F),
       child: Row(
         children: [
           // --- DELETE BUTTON ---
@@ -27,7 +27,7 @@ class EditActionBar extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFE3392F),
                 // Disable button if nothing is selected
-                disabledBackgroundColor: const Color(0xFF162238), 
+                disabledBackgroundColor: const Color(0xFF162238),
               ),
               onPressed: !hasSelection
                   ? null
@@ -37,7 +37,7 @@ class EditActionBar extends StatelessWidget {
                         appState.deleteTask(listId, id);
                       }
                       // Tell controller to turn off edit mode and clear IDs
-                      listController.toggleEditMode(); 
+                      listController.toggleEditMode();
                     },
               child: Text(
                 "Delete ${listController.selectedTaskIds.length}",
@@ -47,9 +47,9 @@ class EditActionBar extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // --- CANCEL BUTTON ---
           Expanded(
             child: ElevatedButton(

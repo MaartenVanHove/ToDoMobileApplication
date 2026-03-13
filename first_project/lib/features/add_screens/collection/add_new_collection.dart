@@ -1,10 +1,9 @@
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/screens/home_screen/collection_view.dart';
+import 'package:first_project/features/home_screen/collection_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AddNewCollectionScreen extends StatelessWidget {
-
   final TextEditingController controller = TextEditingController();
 
   @override
@@ -35,15 +34,15 @@ class AddNewCollectionScreen extends StatelessWidget {
 
   AppBar _buildTitle() {
     return AppBar(
-        backgroundColor: const Color(0xFF0A0F1F),
-        title: Text('Add Collection'),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 32
-        ),
-        centerTitle: true
-      );
+      backgroundColor: const Color(0xFF0A0F1F),
+      title: Text('Add Collection'),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+        fontSize: 32,
+      ),
+      centerTitle: true,
+    );
   }
 
   Widget _buildInputField() {
@@ -55,7 +54,10 @@ class AddNewCollectionScreen extends StatelessWidget {
         labelStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: const Color(0xFF162238),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }
@@ -105,9 +107,7 @@ class AddNewCollectionScreen extends StatelessWidget {
     // Navigate to add tasks
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => CollectionsScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => CollectionsScreen()),
     );
   }
 }

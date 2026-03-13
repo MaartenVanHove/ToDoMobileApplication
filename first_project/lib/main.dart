@@ -1,5 +1,5 @@
-import 'package:first_project/screens/home_screen/collection_view.dart';
-import 'package:first_project/screens/home_screen/collection_controller.dart'; // Add this import
+import 'package:first_project/features/home_screen/collection_view.dart';
+import 'package:first_project/features/home_screen/collection_controller.dart'; // Add this import
 import 'package:first_project/model/app_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -30,10 +30,8 @@ class MyApp extends StatelessWidget {
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),
-          iconTheme: const IconThemeData(color: Colors.white), 
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF3A7AFE),
-          ),
+          iconTheme: const IconThemeData(color: Colors.white),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3A7AFE)),
           useMaterial3: true,
         ),
         home: const CollectionsScreen(),

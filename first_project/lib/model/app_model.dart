@@ -22,18 +22,17 @@ class AppModel extends ChangeNotifier {
     loadTags();
     loadColorPalette();
     loadCollections();
-    print("ALL TAGGS: " + tags.toString());
   }
 
 
   Future<void> loadColorPalette() async {
-    final db = DatabaseServices.instance;
-    // You'll need to add getColors() to your DatabaseServices
     final List<Map<String, dynamic>> maps = await db.getColors(); 
     
     colorPalette = {
       for (var item in maps) item['id'] as int : item['hex_value'] as String
     };
+
+    print("COLOR PALLET: " + colorPalette.toString());
 
     notifyListeners();
   }
@@ -46,6 +45,7 @@ class AppModel extends ChangeNotifier {
   Future<void> loadTags() async {
     final taggMaps = await db.getAllTags();
     tags = taggMaps.map((t) => Tag.fromMap(t)).toList();
+    print("TAGS: " + tags.toString());
   }
 
   Future<int> createTag(String name) async {
@@ -80,6 +80,8 @@ class AppModel extends ChangeNotifier {
       await loadLists(collection.id);
     }
 
+    print("COLLECTIONS: " + collections.toString());
+
     notifyListeners();
   }
 
@@ -98,6 +100,8 @@ class AppModel extends ChangeNotifier {
       // Create the TodoList with the fetched tags
       final list = TodoList.fromMap(map, tags: tagsForThisList);
       hydratedLists.add(list);
+
+      print("LISTS: " + list.toString());
 
       await loadTasks(listId);
     }

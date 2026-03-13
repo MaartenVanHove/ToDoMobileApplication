@@ -1,26 +1,22 @@
 import 'package:first_project/core/constants/app_strings.dart';
-import 'package:first_project/screens/list_screen/widget_views/edit_action_bar.dart';
-import 'package:first_project/screens/list_screen/widget_views/list_tool_bar.dart';
-import 'package:first_project/screens/list_screen/widget_views/task_completedlist_section.dart';
-import 'package:first_project/screens/list_screen/widget_views/task_input_field.dart';
-import 'package:first_project/screens/list_screen/widget_views/task_todolist_section.dart';
-import 'package:first_project/screens/list_screen/widget_views/title.dart';
+import 'package:first_project/features/list_screen/widget_views/edit_action_bar.dart';
+import 'package:first_project/features/list_screen/widget_views/list_tool_bar.dart';
+import 'package:first_project/features/list_screen/widget_views/task_completedlist_section.dart';
+import 'package:first_project/features/list_screen/widget_views/task_input_field.dart';
+import 'package:first_project/features/list_screen/widget_views/task_todolist_section.dart';
+import 'package:first_project/features/list_screen/widget_views/title.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 
 class ListScreen extends StatefulWidget {
   final int listId;
   final String listName;
 
-  const ListScreen({
-    super.key,
-    required this.listId,
-    required this.listName,
-  });
+  const ListScreen({super.key, required this.listId, required this.listName});
 
   @override
   State<ListScreen> createState() => _ListScreenState();
@@ -44,35 +40,42 @@ class _ListScreenState extends State<ListScreen> {
         builder: (context, appState, listController, child) {
           final allTasks = appState.tasks[widget.listId] ?? [];
           final todoTasks = allTasks.where((task) => !task.isFinished).toList();
-          final finishedTasks = allTasks.where((task) => task.isFinished).toList();
+          final finishedTasks = allTasks
+              .where((task) => task.isFinished)
+              .toList();
           final list = appState.getListById(widget.listId);
 
           return Scaffold(
-            appBar: ListScreenTitle(listId: widget.listId, title: list?.name ?? widget.listName),
+            appBar: ListScreenTitle(
+              listId: widget.listId,
+              title: list?.name ?? widget.listName,
+            ),
             body: SafeArea(
               child: Column(
                 children: [
                   ListToolBar(),
-                  
+
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          if (allTasks.isEmpty)
-                            _buildEmptyStateView(),
+                          if (allTasks.isEmpty) _buildEmptyStateView(),
 
                           TaskListView(tasks: todoTasks, listId: widget.listId),
-                          TaskCompletedListView(tasks: finishedTasks, listId: widget.listId),
+                          TaskCompletedListView(
+                            tasks: finishedTasks,
+                            listId: widget.listId,
+                          ),
                         ],
                       ),
                     ),
                   ),
 
-                  listController.isEditMode 
+                  listController.isEditMode
                       ? EditActionBar(listId: widget.listId)
                       : listController.isEditingTitle
-                          ? const SizedBox.shrink()
-                          : TaskInputField(listId: widget.listId),
+                      ? const SizedBox.shrink()
+                      : TaskInputField(listId: widget.listId),
                 ],
               ),
             ),

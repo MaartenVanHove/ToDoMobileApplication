@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'package:first_project/model/app_model.dart';
 import 'package:first_project/services/media/image_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class BaseTaskCard extends StatelessWidget {
   final String title;
