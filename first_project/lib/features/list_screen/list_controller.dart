@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -127,5 +128,17 @@ class ListController extends ChangeNotifier {
     isEditMode = false;
     selectedTaskIds.clear();
     notifyListeners();
+  }
+
+  void AddNewTag(BuildContext context, AppModel appState, int listId) async {
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) =>
+          InputDialog(title: "Add Tag", hint: "Example: Workout or groceries"),
+    );
+    if (name != null) {
+      int tagId = await appState.createTag(name);
+      appState.attachListAndTag(listId, tagId);
+    }
   }
 }

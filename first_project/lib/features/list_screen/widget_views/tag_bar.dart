@@ -1,5 +1,5 @@
 import 'package:first_project/core/theme/app_theme_colors.dart';
-import 'package:first_project/widgets/dialogs/input_dialog.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/model/app_model.dart';
@@ -12,7 +12,8 @@ class FilterBarList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<CollectionController>();
+    final collectionController = context.watch<CollectionController>();
+    final listController = context.read<ListController>();
     final appState = context.watch<AppModel>();
     final list = appState.getListById(listId);
 
@@ -28,11 +29,13 @@ class FilterBarList extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               if (index == 0) {
-                final isAllSelected = controller.selectedTagIds.isEmpty;
+                final isAllSelected =
+                    collectionController.selectedTagIds.isEmpty;
                 return ActionChip(
                   label: const Text("Tag"),
                   avatar: const Icon(Icons.add, color: Colors.white, size: 18),
-                  onPressed: () => _AddNewTag(context, appState, listId),
+                  onPressed: () =>
+                      listController.AddNewTag(context, appState, listId),
                   backgroundColor: AppThemeColors.accent,
                   labelStyle: TextStyle(
                     color: isAllSelected ? Colors.white : Colors.white54,
@@ -62,17 +65,5 @@ class FilterBarList extends StatelessWidget {
         const SizedBox(height: 8),
       ],
     );
-  }
-
-  void _AddNewTag(BuildContext context, AppModel appState, int listId) async {
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) =>
-          InputDialog(title: "Add Tag", hint: "Example: Workout or groceries"),
-    );
-    if (name != null) {
-      int tagId = await appState.createTag(name);
-      appState.attachListAndTag(listId, tagId);
-    }
   }
 }
