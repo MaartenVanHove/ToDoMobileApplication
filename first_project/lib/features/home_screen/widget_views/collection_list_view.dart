@@ -1,4 +1,4 @@
-import 'package:first_project/screens/home_screen/collection_controller.dart';
+import 'package:first_project/features/home_screen/collection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:first_project/model/app_model.dart';
 import 'package:first_project/widgets/cards/lists/list_card.dart';
@@ -13,8 +13,8 @@ class CollectionListView extends StatelessWidget {
   final Function(int, int, String) onDeleteList;
 
   const CollectionListView({
-    super.key, 
-    required this.collectionId, 
+    super.key,
+    required this.collectionId,
     required this.appState,
     required this.onNavigateToList,
     required this.onAddList,
@@ -28,7 +28,9 @@ class CollectionListView extends StatelessWidget {
 
     final allLists = appController.lists.values.expand((list) => list).toList();
     final processedLists = collectionController.getProcessedLists(allLists);
-    final displayLists = processedLists.where((l) => l.collectionId == collectionId).toList();
+    final displayLists = processedLists
+        .where((l) => l.collectionId == collectionId)
+        .toList();
 
     return SizedBox(
       height: 180,
@@ -47,7 +49,7 @@ class CollectionListView extends StatelessWidget {
           }
 
           // Grab the list at this index from the processed (filtered) list
-          final list = displayLists[index];          
+          final list = displayLists[index];
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),

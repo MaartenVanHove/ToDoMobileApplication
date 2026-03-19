@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/screens/home_screen/collection_controller.dart';
+import 'package:first_project/features/home_screen/collection_controller.dart';
 
 class FilterBar extends StatelessWidget {
   const FilterBar({super.key});
@@ -39,7 +39,11 @@ class FilterBar extends StatelessWidget {
               ),
               if (controller.searchQuery.isNotEmpty)
                 IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.white54, size: 20),
+                  icon: const Icon(
+                    Icons.clear,
+                    color: Colors.white54,
+                    size: 20,
+                  ),
                   onPressed: () => controller.clearSearch(),
                 ),
             ],
@@ -64,7 +68,9 @@ class FilterBar extends StatelessWidget {
                   selectedColor: const Color(0xFF3A7AFE),
                   backgroundColor: const Color(0xFF162238),
                   showCheckmark: false,
-                  labelStyle: TextStyle(color: isAllSelected ? Colors.white : Colors.white54),
+                  labelStyle: TextStyle(
+                    color: isAllSelected ? Colors.white : Colors.white54,
+                  ),
                 );
               }
 
@@ -78,8 +84,12 @@ class FilterBar extends StatelessWidget {
                 selectedColor: const Color(0xFF3A7AFE),
                 backgroundColor: const Color(0xFF162238),
                 showCheckmark: false,
-                labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.white70),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white70,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               );
             },
           ),

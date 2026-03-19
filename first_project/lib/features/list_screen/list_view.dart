@@ -1,6 +1,7 @@
 import 'package:first_project/core/constants/app_strings.dart';
 import 'package:first_project/features/list_screen/widget_views/edit_action_bar.dart';
 import 'package:first_project/features/list_screen/widget_views/list_tool_bar.dart';
+import 'package:first_project/features/list_screen/widget_views/tag_bar.dart';
 import 'package:first_project/features/list_screen/widget_views/task_completedlist_section.dart';
 import 'package:first_project/features/list_screen/widget_views/task_input_field.dart';
 import 'package:first_project/features/list_screen/widget_views/task_todolist_section.dart';
@@ -53,6 +54,8 @@ class _ListScreenState extends State<ListScreen> {
             body: SafeArea(
               child: Column(
                 children: [
+                  SizedBox(height: 12),
+                  FilterBarList(listId: widget.listId),
                   ListToolBar(),
 
                   Expanded(

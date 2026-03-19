@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:first_project/model/app_model.dart';
 
 class TaskInputField extends StatelessWidget {
@@ -46,13 +46,17 @@ class TaskInputField extends StatelessWidget {
                         color: Colors.black54,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 20),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          
+
           // 2. Input Row
           Row(
             // Align items to the bottom so the Add button stays down while the field expands
@@ -67,7 +71,7 @@ class TaskInputField extends StatelessWidget {
                   child: TextField(
                     controller: listController.textController,
                     style: const TextStyle(color: Colors.white),
-                    
+
                     // --- MULTILINE LOGIC ---
                     keyboardType: TextInputType.multiline,
                     minLines: 1,
@@ -75,8 +79,8 @@ class TaskInputField extends StatelessWidget {
                     // -----------------------
 
                     // This ensures the camera icon toggles visibility as you type
-                    onChanged: (text) => () {}, 
-                    
+                    onChanged: (text) => () {},
+
                     decoration: InputDecoration(
                       hintText: 'Enter new Task...',
                       hintStyle: const TextStyle(color: Color(0xFF9BB3D1)),
@@ -88,14 +92,22 @@ class TaskInputField extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.photo_library, color: Color(0xFF9BB3D1)),
-                            onPressed: () => listController.pickImage(ImageSource.gallery),
+                            icon: const Icon(
+                              Icons.photo_library,
+                              color: Color(0xFF9BB3D1),
+                            ),
+                            onPressed: () =>
+                                listController.pickImage(ImageSource.gallery),
                           ),
                           // Toggle visibility based on text input
                           if (listController.textController.text.isEmpty)
                             IconButton(
-                              icon: const Icon(Icons.camera_alt, color: Color(0xFF9BB3D1)),
-                              onPressed: () => listController.pickImage(ImageSource.camera),
+                              icon: const Icon(
+                                Icons.camera_alt,
+                                color: Color(0xFF9BB3D1),
+                              ),
+                              onPressed: () =>
+                                  listController.pickImage(ImageSource.camera),
                             ),
                         ],
                       ),
@@ -113,10 +125,14 @@ class TaskInputField extends StatelessWidget {
     );
   }
 
-  Widget _buildAddButton(BuildContext context, ListController controller, AppModel appState) {
+  Widget _buildAddButton(
+    BuildContext context,
+    ListController controller,
+    AppModel appState,
+  ) {
     return Container(
       // Padding ensures it matches the height profile of a single-line input bar
-      margin: const EdgeInsets.only(bottom: 4), 
+      margin: const EdgeInsets.only(bottom: 4),
       decoration: const BoxDecoration(
         color: Color(0xFF3A7AFE),
         shape: BoxShape.circle,

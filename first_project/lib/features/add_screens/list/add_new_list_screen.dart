@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:first_project/core/theme/app_theme_colors.dart';
 import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -268,11 +269,16 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
                           ? _selectedTagIds.add(tag.id)
                           : _selectedTagIds.remove(tag.id),
                     ),
+                    onDeleted: () => appState.deleteTag(tag.id),
                     selectedColor: themeColor.withOpacity(0.5),
                   ),
                 ),
                 ActionChip(
-                  label: const Text("New Tag"),
+                  label: const Text(
+                    "New Tag",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: themeColor,
                   onPressed: () => _showCreateTagDialog(appState),
                 ),
               ],
@@ -286,7 +292,10 @@ class _AddNewListScreenState extends State<AddNewListScreen> {
   void _showCreateTagDialog(AppModel appState) async {
     final name = await showDialog<String>(
       context: context,
-      builder: (_) => InputDialog(title: "Create new Tag"),
+      builder: (_) => InputDialog(
+        title: "Create new Tag",
+        hint: "Example: Workout or groceries",
+      ),
     );
     if (name != null && name.trim().isNotEmpty) {
       final newId = await appState.createTag(name.trim());

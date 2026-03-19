@@ -6,7 +6,6 @@ import 'package:first_project/services/db/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class AppModel extends ChangeNotifier {
-  
   List<Collection> collections = [];
   Map<int, List<TodoList>> lists = {}; // int represent collectionId
   Map<int, List<Task>> tasks = {}; // int represent listId
@@ -24,15 +23,12 @@ class AppModel extends ChangeNotifier {
     loadCollections();
   }
 
-
   Future<void> loadColorPalette() async {
-    final List<Map<String, dynamic>> maps = await db.getColors(); 
-    
-    colorPalette = {
-      for (var item in maps) item['id'] as int : item['hex_value'] as String
-    };
+    final List<Map<String, dynamic>> maps = await db.getColors();
 
-    print("COLOR PALLET: " + colorPalette.toString());
+    colorPalette = {
+      for (var item in maps) item['id'] as int: item['hex_value'] as String,
+    };
 
     notifyListeners();
   }
@@ -45,14 +41,19 @@ class AppModel extends ChangeNotifier {
   Future<void> loadTags() async {
     final taggMaps = await db.getAllTags();
     tags = taggMaps.map((t) => Tag.fromMap(t)).toList();
-    print("TAGS: " + tags.toString());
+  }
+
+  Future<void> deleteTag(int id) async {
+    await db.deleteTag(id);
+    tags.removeWhere((tag) => tag.id == id);
+    notifyListeners();
   }
 
   Future<int> createTag(String name) async {
     final cleanName = name.trim();
-    
+
     final existingTag = tags.where(
-      (t) => t.name.toLowerCase() == cleanName.toLowerCase()
+      (t) => t.name.toLowerCase() == cleanName.toLowerCase(),
     );
 
     if (existingTag.isNotEmpty) {
@@ -61,65 +62,76 @@ class AppModel extends ChangeNotifier {
 
     // If not, save to DB
     final id = await db.addTag(cleanName);
-    
+
     if (id != -1 && id != 0) {
       tags.add(Tag.Tag(id: id, name: cleanName));
       tags.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       notifyListeners();
     }
-    
+
     return id;
+  }
+
+  Future<void> attachListAndTag(int listId, int tagId) async {
+    await db.attachListAndTag(listId, tagId);
+    final tag = tags.firstWhere((tag) => tag.id == tagId);
+    getListById(listId)?.tags.insert(0, tag);
+
+    notifyListeners();
+  }
+
+  Future<void> detachTagToList(int listId, int tagId) async {
+    await db.detachTagToList(listId, tagId);
+    getListById(listId)?.tags.removeWhere((tag) => tag.id == tagId);
+
+    notifyListeners();
   }
 
   Future<void> loadCollections() async {
     final collectionMaps = await db.getAllCollections();
     collections = collectionMaps.map((e) => Collection.fromMap(e)).toList();
 
-    // Load lists for each collection    
+    // Load lists for each collection
     for (var collection in collections) {
       await loadLists(collection.id);
     }
-
-    print("COLLECTIONS: " + collections.toString());
 
     notifyListeners();
   }
 
   Future<void> loadLists(int collectionId) async {
     final listMaps = await db.getAllTodoLists(collectionId);
-    
+
     List<TodoList> hydratedLists = [];
 
     for (var map in listMaps) {
       int listId = map['id'];
-      
+
       // FETCH THE TAGS from the DB for this specific list
       final tagMaps = await db.getTagsFromList(listId);
       final tagsForThisList = tagMaps.map((t) => Tag.fromMap(t)).toList();
-      
+
       // Create the TodoList with the fetched tags
       final list = TodoList.fromMap(map, tags: tagsForThisList);
       hydratedLists.add(list);
-
-      print("LISTS: " + list.toString());
 
       await loadTasks(listId);
     }
 
     // 5. Update the state
     lists[collectionId] = hydratedLists;
-    
+
     notifyListeners();
   }
 
   TodoList? getListById(int listId) {
-  for (var collectionLists in lists.values) {
-    for (var list in collectionLists) {
-      if (list.id == listId) return list;
+    for (var collectionLists in lists.values) {
+      for (var list in collectionLists) {
+        if (list.id == listId) return list;
+      }
     }
+    return null; // not found
   }
-  return null; // not found
-}
 
   Future<void> loadTasks(int listId) async {
     final taskMaps = await db.getTasks(listId);
@@ -141,24 +153,29 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> createList(String name, int collectionId, String? imagePath, int colorId) async {
+  Future<int> createList(
+    String name,
+    int collectionId,
+    String? imagePath,
+    int colorId,
+  ) async {
     // 1. Save to Database (Ensure DatabaseServices.addTodoList accepts imagePath)
     final id = await db.addTodoList(imagePath, name, collectionId, colorId);
-    
+
     // 2. Create the model instance
     final newList = TodoList(
-      id: id, 
-      name: name, 
-      collectionId: collectionId, 
+      id: id,
+      name: name,
+      collectionId: collectionId,
       imagePath: imagePath,
       colorId: colorId,
     );
-    
+
     // Update local state
     lists.putIfAbsent(collectionId, () => []);
     lists[collectionId]!.insert(0, newList);
     tasks[id] = [];
-    
+
     notifyListeners();
     return id;
   }
@@ -172,7 +189,13 @@ class AppModel extends ChangeNotifier {
 
   Future<int> addTask(int listId, String name, String? imagePath) async {
     final taskId = await db.addTask(imagePath, listId, name);
-    final newTask = Task(id: taskId, listId: listId, name: name, isFinished: false, imagePath: imagePath);
+    final newTask = Task(
+      id: taskId,
+      listId: listId,
+      name: name,
+      isFinished: false,
+      imagePath: imagePath,
+    );
     tasks.putIfAbsent(listId, () => []);
     tasks[listId]!.insert(0, newTask);
     notifyListeners();
@@ -205,13 +228,13 @@ class AppModel extends ChangeNotifier {
     db.updateTaskName(task.id, name);
     final list = tasks[task.listId]!;
     final index = list.indexWhere((t) => t.id == task.id);
-    if(index != -1) {
+    if (index != -1) {
       list[index] = Task(
         id: task.id,
         listId: task.listId,
         name: name,
         isFinished: task.isFinished,
-        imagePath: task.imagePath
+        imagePath: task.imagePath,
       );
       notifyListeners();
     }
@@ -221,14 +244,14 @@ class AppModel extends ChangeNotifier {
     db.updateListName(list.id, name);
     final collection = lists[list.collectionId]!;
     final index = collection.indexWhere((l) => l.id == list.id);
-    if(index != -1) {
+    if (index != -1) {
       collection[index] = TodoList(
-        id: list.id, 
+        id: list.id,
         collectionId: list.collectionId,
         name: name,
         imagePath: list.imagePath,
         colorId: list.colorId,
-        tags: list.tags,  
+        tags: list.tags,
       );
       notifyListeners();
     }
@@ -238,10 +261,7 @@ class AppModel extends ChangeNotifier {
     db.updateCollectionName(collection.id, name);
     final index = collections.indexWhere((c) => c.id == collection.id);
     if (index != -1) {
-      collections[index] = new Collection(
-        id: collection.id, 
-        name: name
-      );
+      collections[index] = new Collection(id: collection.id, name: name);
       notifyListeners();
     }
   }
@@ -251,10 +271,7 @@ class AppModel extends ChangeNotifier {
 
     final finished = all.where((t) => t.isFinished).toList();
 
-    tasks[listId] = [
-      ...reorderedTodos,
-      ...finished,
-    ];
+    tasks[listId] = [...reorderedTodos, ...finished];
 
     notifyListeners();
   }
@@ -263,13 +280,13 @@ class AppModel extends ChangeNotifier {
     db.updateTaskImage(task.id, imagePath);
     final list = tasks[task.listId]!;
     final index = list.indexWhere((t) => t.id == task.id);
-    if(index != -1) {
+    if (index != -1) {
       list[index] = Task(
         id: task.id,
         listId: task.listId,
         name: task.name,
         isFinished: task.isFinished,
-        imagePath: imagePath
+        imagePath: imagePath,
       );
       notifyListeners();
     }
@@ -279,9 +296,9 @@ class AppModel extends ChangeNotifier {
     db.updateListImage(list.id, imagePath);
     final collection = lists[list.collectionId]!;
     final index = collection.indexWhere((l) => l.id == list.id);
-    if(index != -1) {
+    if (index != -1) {
       collection[index] = TodoList(
-        id: list.id, 
+        id: list.id,
         collectionId: list.collectionId,
         name: list.name,
         imagePath: imagePath,

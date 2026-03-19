@@ -1,6 +1,6 @@
 import 'package:first_project/models/task.dart';
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/todo_card.dart';
 import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +10,7 @@ class TaskListView extends StatelessWidget {
   final List<Task> tasks;
   final int listId;
 
-  const TaskListView({
-    super.key,
-    required this.tasks,
-    required this.listId,
-  });
+  const TaskListView({super.key, required this.tasks, required this.listId});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +34,9 @@ class TaskListView extends StatelessWidget {
 
         return Dismissible(
           key: ValueKey(task.id),
-          direction: listController.isEditMode ? DismissDirection.none : DismissDirection.endToStart,
+          direction: listController.isEditMode
+              ? DismissDirection.none
+              : DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
@@ -52,25 +50,28 @@ class TaskListView extends StatelessWidget {
             index: index,
             isEditMode: listController.isEditMode,
             isSelected: listController.selectedTaskIds.contains(task.id),
-            
+
             onTapSelect: () => listController.toggleSelection(task.id),
-            
+
             onPressedEdit: () => listController.activateEditWithTask(task.id),
-            
+
             onTapUpdateName: () async {
               final newName = await showDialog<String>(
                 context: context,
-                builder: (_) => InputDialog(title: "Change '${task.name}' name"),
+                builder: (_) =>
+                    InputDialog(title: "Change '${task.name}' name"),
               );
               if (newName != null && newName.trim().isNotEmpty) {
                 appState.updateTaskName(task, newName.trim());
-                listController.toggleEditMode(); // Closes edit mode after change
+                listController
+                    .toggleEditMode(); // Closes edit mode after change
               }
             },
-            
+
             onTapInstantDelete: () => appState.deleteTask(listId, task.id),
-            
-            onImageChanged: (newPath) => appState.updateTaskImage(task, newPath),
+
+            onImageChanged: (newPath) =>
+                appState.updateTaskImage(task, newPath),
             onTextChanged: (newText) => appState.updateTaskName(task, newText),
           ),
         );

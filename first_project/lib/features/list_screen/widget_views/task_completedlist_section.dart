@@ -1,6 +1,6 @@
 import 'package:first_project/models/task.dart';
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/screens/list_screen/list_controller.dart';
+import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:first_project/widgets/cards/tasks/completed_card.dart'; // Ensure correct import
 import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
@@ -44,22 +44,19 @@ class TaskCompletedListView extends StatelessWidget {
             index: index,
             isEditMode: listController.isEditMode,
             isSelected: listController.selectedTaskIds.contains(task.id),
-            
-            // --- UI State Actions (via Controller) ---
+
             onTapSelect: () {
               if (!listController.isEditMode) return;
               listController.toggleSelection(task.id);
             },
             onPressedEdit: () => listController.activateEditWithTask(task.id),
 
-            // --- Data Actions (via AppState) ---
             onTapUpdateName: () async {
               final newName = await showDialog<String>(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => InputDialog(
-                  title: "Change '${task.name}' name",
-                ),
+                builder: (_) =>
+                    InputDialog(title: "Change '${task.name}' name"),
               );
 
               if (newName != null && newName.trim().isNotEmpty) {
