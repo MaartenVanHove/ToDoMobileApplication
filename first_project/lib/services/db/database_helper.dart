@@ -3,7 +3,6 @@ import 'package:first_project/core/theme/app_theme_colors.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class DatabaseServices {
   static final DatabaseServices instance = DatabaseServices._init();
   static Database? _database;
@@ -20,7 +19,7 @@ class DatabaseServices {
     final path = join(await getDatabasesPath(), 'master_db.db');
     return await openDatabase(
       path,
-      version: 7, // Newest version is 7 (tag system)
+      version: 8, // Newest version is 8 (reorderable)
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -105,7 +104,9 @@ class DatabaseServices {
       ''');
 
       // Safe way to add column if it doesn't exist
-      await db.execute('ALTER TABLE todo_lists ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0');
+      await db.execute(
+        'ALTER TABLE todo_lists ADD COLUMN collection_id INTEGER NOT NULL DEFAULT 0',
+      );
     }
 
     if (oldVersion < 3) {
@@ -127,7 +128,9 @@ class DatabaseServices {
       ''');
 
       // 2. Add color_id to todo_lists
-      await db.execute('ALTER TABLE todo_lists ADD COLUMN color_id INTEGER DEFAULT 1');
+      await db.execute(
+        'ALTER TABLE todo_lists ADD COLUMN color_id INTEGER DEFAULT 1',
+      );
 
       // 3. Seed the colors
       final standardColors = AppThemeColors.palette.entries.map((entry) {
@@ -164,7 +167,15 @@ class DatabaseServices {
 
     if (oldVersion < 7) {
       // This creates a unique constraint on the name column of the existing tags table
-      await db.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_tags_name ON tags (name)');
+      await db.execute(
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_tags_name ON tags (name)',
+      );
+    }
+
+    if (oldVersion < 8) {
+      await db.execute(
+        'ALTER TABLE tasks ADD COLUMN position INTEGER NOT NULL DEFAULT 0',
+      );
     }
   }
 
@@ -180,31 +191,29 @@ class DatabaseServices {
     return await db.insert('collection', {'name': name});
   }
 
-  Future<int> addTodoList(String? imagePath, String name, int collectionId, int colorId) async {
+  Future<int> addTodoList(
+    String? imagePath,
+    String name,
+    int collectionId,
+    int colorId,
+  ) async {
     final db = await database;
-    return await db.insert(
-      'todo_lists',
-      {
-        'collection_id': collectionId,
-        'name': name,
-        'image_path': imagePath,
-        'color_id': colorId,
-      },
-    );
+    return await db.insert('todo_lists', {
+      'collection_id': collectionId,
+      'name': name,
+      'image_path': imagePath,
+      'color_id': colorId,
+    });
   }
-
 
   Future<int> addTask(String? imagePath, int listId, String name) async {
     final db = await database;
-    return await db.insert(
-      'tasks', 
-      {
-        'list_id': listId,
-        'name': name,
-        'is_finished': 0,
-        'image_path': imagePath,
-      }
-    );
+    return await db.insert('tasks', {
+      'list_id': listId,
+      'name': name,
+      'is_finished': 0,
+      'image_path': imagePath,
+    });
   }
 
   Future<List<Map<String, dynamic>>> getAllCollections() async {
@@ -215,9 +224,9 @@ class DatabaseServices {
   Future<List<Map<String, dynamic>>> getAllTodoLists(int collectionId) async {
     final db = await database;
     return await db.query(
-      'todo_lists', 
-      where: 'collection_id = ?', 
-      whereArgs: [collectionId]
+      'todo_lists',
+      where: 'collection_id = ?',
+      whereArgs: [collectionId],
     );
   }
 
@@ -227,6 +236,7 @@ class DatabaseServices {
       'tasks',
       where: 'list_id = ?',
       whereArgs: [listId],
+      orderBy: "position ASC",
     );
   }
 
@@ -236,7 +246,7 @@ class DatabaseServices {
       'todo_lists',
       {'name': name},
       where: 'id = ?',
-      whereArgs: [id]
+      whereArgs: [id],
     );
   }
 
@@ -246,7 +256,7 @@ class DatabaseServices {
       'collection',
       {'name': name},
       where: 'id = ?',
-      whereArgs: [id]
+      whereArgs: [id],
     );
   }
 
@@ -262,58 +272,41 @@ class DatabaseServices {
 
   Future<void> updateTaskName(int id, String name) async {
     final db = await database;
-    await db.update(
-      'tasks', 
-      {'name': name},
-      where: 'id = ?',
-      whereArgs: [id]
-    );
+    await db.update('tasks', {'name': name}, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> updateTaskImage(int id, String? imagePath) async {
     final db = await database;
     await db.update(
-      'tasks', 
+      'tasks',
       {'image_path': imagePath},
       where: 'id = ?',
-      whereArgs: [id]
+      whereArgs: [id],
     );
   }
 
   Future<void> deleteCollection(int id) async {
     final db = await database;
-    await db.delete(
-      'collection',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('collection', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> deleteTodoList(int id) async {
     final db = await database;
-    await db.delete(
-      'todo_lists',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('todo_lists', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> deleteTask(int id) async {
     final db = await database;
-    await db.delete(
-      'tasks',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> updateListImage(int id, String? imagePath) async {
     final db = await database;
     await db.update(
-      'todo_lists', 
+      'todo_lists',
       {'image_path': imagePath},
       where: 'id = ?',
-      whereArgs: [id]
+      whereArgs: [id],
     );
   }
 
@@ -321,10 +314,9 @@ class DatabaseServices {
 
   Future<int> addTag(String name) async {
     final db = await database;
-    return await db.insert('tags', 
-      {'name' : name.trim()},
-      conflictAlgorithm: ConflictAlgorithm.ignore
-    );
+    return await db.insert('tags', {
+      'name': name.trim(),
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
   Future<List<Map<String, dynamic>>> getAllTags() async {
@@ -334,7 +326,12 @@ class DatabaseServices {
 
   Future<void> updateTag(int id, String newName) async {
     final db = await database;
-    await db.update('tags', {'name': newName}, where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'tags',
+      {'name': newName},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> deleteTag(int id) async {
@@ -344,40 +341,61 @@ class DatabaseServices {
 
   Future<void> attachListAndTag(int listId, int tagId) async {
     final db = await database;
-    await db.insert('list_tags', {
-        'list_id': listId,
-        'tag_id': tagId,
-      }, conflictAlgorithm: ConflictAlgorithm.ignore // prevent duplicates.
+    await db.insert(
+      'list_tags',
+      {'list_id': listId, 'tag_id': tagId},
+      conflictAlgorithm: ConflictAlgorithm.ignore, // prevent duplicates.
     );
   }
 
   Future<void> detachTagToList(int listId, int tagId) async {
     final db = await database;
-    await db.delete('list_tags', 
-      where: 'list_id = ? AND tag_id = ?', 
-      whereArgs: [listId, tagId]
+    await db.delete(
+      'list_tags',
+      where: 'list_id = ? AND tag_id = ?',
+      whereArgs: [listId, tagId],
     );
   }
-
 
   // ------------- RELATIONSHIP QUERIES -------------
 
   Future<List<Map<String, dynamic>>> getTagsFromList(int listId) async {
     final db = await database;
-    return await db.rawQuery('''
+    return await db.rawQuery(
+      '''
       SELECT tags.* FROM tags
       INNER JOIN list_tags ON tags.id = list_tags.tag_id
       WHERE list_tags.list_id = ?
-    ''', [listId]);
+    ''',
+      [listId],
+    );
   }
 
   Future<List<Map<String, dynamic>>> getListsByTag(int tagId) async {
     final db = await database;
-    return await db.rawQuery('''
+    return await db.rawQuery(
+      '''
       SELECT todo_lists.* FROM todo_lists
       INNER JOIN list_tags ON todo_lists.id = list_tags.list_id
       WHERE list_tags.tag_id = ?
-    ''', [tagId]);
+    ''',
+      [tagId],
+    );
   }
 
+  Future<void> updateTasksOrder(List<int> taskIds) async {
+    final db = await database;
+    final batch = db.batch();
+
+    for (int i = 0; i < taskIds.length; i++) {
+      batch.update(
+        'tasks',
+        {'position': i},
+        where: 'id = ?',
+        whereArgs: [taskIds[i]],
+      );
+    }
+
+    await batch.commit(noResult: true);
+  }
 }

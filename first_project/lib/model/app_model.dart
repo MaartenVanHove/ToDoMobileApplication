@@ -134,7 +134,9 @@ class AppModel extends ChangeNotifier {
   }
 
   Future<void> loadTasks(int listId) async {
-    final taskMaps = await db.getTasks(listId);
+    final taskMaps = await db.getTasks(
+      listId,
+    ); // Ensure db.getTasks uses ORDER BY position ASC
     tasks[listId] = taskMaps.map((e) => Task.fromMap(e)).toList();
     notifyListeners();
   }
@@ -187,7 +189,12 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> addTask(int listId, String name, String? imagePath) async {
+  Future<int> addTask(
+    int listId,
+    String name,
+    String? imagePath,
+    int position,
+  ) async {
     final taskId = await db.addTask(imagePath, listId, name);
     final newTask = Task(
       id: taskId,
@@ -195,6 +202,7 @@ class AppModel extends ChangeNotifier {
       name: name,
       isFinished: false,
       imagePath: imagePath,
+      position: position,
     );
     tasks.putIfAbsent(listId, () => []);
     tasks[listId]!.insert(0, newTask);
@@ -208,10 +216,15 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleTaskFinished(Task task) async {
+  Future<void> toggleTaskFinished(
+    Task task,
+    int finishedPosition,
+    int regularPosition,
+  ) async {
     await db.updateTaskFinished(task.id, !task.isFinished);
     final list = tasks[task.listId]!;
     final index = list.indexWhere((t) => t.id == task.id);
+    final position = task.isFinished ? regularPosition : finishedPosition;
     if (index != -1) {
       list[index] = Task(
         id: task.id,
@@ -219,6 +232,7 @@ class AppModel extends ChangeNotifier {
         name: task.name,
         isFinished: !task.isFinished,
         imagePath: task.imagePath,
+        position: position,
       );
       notifyListeners();
     }
@@ -235,6 +249,7 @@ class AppModel extends ChangeNotifier {
         name: name,
         isFinished: task.isFinished,
         imagePath: task.imagePath,
+        position: task.position,
       );
       notifyListeners();
     }
@@ -266,16 +281,6 @@ class AppModel extends ChangeNotifier {
     }
   }
 
-  void updateTaskOrder(int listId, List<Task> reorderedTodos) {
-    final all = tasks[listId] ?? [];
-
-    final finished = all.where((t) => t.isFinished).toList();
-
-    tasks[listId] = [...reorderedTodos, ...finished];
-
-    notifyListeners();
-  }
-
   void updateTaskImage(Task task, String? imagePath) {
     db.updateTaskImage(task.id, imagePath);
     final list = tasks[task.listId]!;
@@ -287,6 +292,7 @@ class AppModel extends ChangeNotifier {
         name: task.name,
         isFinished: task.isFinished,
         imagePath: imagePath,
+        position: task.position,
       );
       notifyListeners();
     }
@@ -306,5 +312,22 @@ class AppModel extends ChangeNotifier {
       );
       notifyListeners();
     }
+  }
+
+  // Inside AppModel class
+  void updateTaskOrder(int listId, List<Task> reorderedTodos) async {
+    // 1. Get the finished tasks (we keep them at the bottom, usually)
+    final allTasks = tasks[listId] ?? [];
+    final finished = allTasks.where((t) => t.isFinished).toList();
+
+    // 2. Combine new order with the finished ones
+    final updatedFullList = [...reorderedTodos, ...finished];
+    tasks[listId] = updatedFullList;
+    notifyListeners();
+
+    // 3. Persist to Database
+    // Create a list of IDs in the exact order they appear now
+    final taskIds = updatedFullList.map((t) => t.id).toList();
+    await db.updateTasksOrder(taskIds);
   }
 }

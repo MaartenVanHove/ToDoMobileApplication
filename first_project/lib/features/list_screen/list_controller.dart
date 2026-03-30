@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:first_project/features/home_screen/collection_controller.dart';
+import 'package:first_project/models/task.dart';
 import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -97,7 +99,12 @@ class ListController extends ChangeNotifier {
   }
 
   // --- Database Actions ---
-  Future<void> saveTask(AppModel appController, int listId) async {
+
+  Future<void> saveTask(
+    AppModel appController,
+    CollectionController collectionController,
+    int listId,
+  ) async {
     final name = textController.text.trim();
     if (name.isEmpty) return;
 
@@ -115,10 +122,26 @@ class ListController extends ChangeNotifier {
       }
     }
 
-    appController.addTask(listId, name, savedPath);
+    appController.addTask(
+      listId,
+      name,
+      savedPath,
+      getTodoTasks(appController, listId).length,
+    );
+
     textController.clear();
     imageFile = null;
     notifyListeners();
+  }
+
+  List<Task> getTodoTasks(AppModel appController, int listId) {
+    final allTasks = appController.tasks[listId] ?? [];
+    return allTasks.where((task) => !task.isFinished).toList();
+  }
+
+  List<Task> getFinishedTasks(AppModel appController, int listId) {
+    final allTasks = appController.tasks[listId] ?? [];
+    return allTasks.where((task) => task.isFinished).toList();
   }
 
   void deleteSelected(AppModel appController, int listId) {
@@ -130,7 +153,7 @@ class ListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void AddNewTag(BuildContext context, AppModel appState, int listId) async {
+  void addNewTag(BuildContext context, AppModel appState, int listId) async {
     final name = await showDialog<String>(
       context: context,
       builder: (_) =>

@@ -4,6 +4,7 @@ class Task {
   final String name;
   final bool isFinished;
   final String? imagePath;
+  final int position;
 
   Task({
     required this.id,
@@ -11,6 +12,7 @@ class Task {
     required this.name,
     required this.isFinished,
     this.imagePath,
+    required this.position,
   });
 
   factory Task.fromMap(Map<String, dynamic> map) {
@@ -19,7 +21,8 @@ class Task {
       listId: map['list_id'],
       name: map['name'],
       isFinished: map['is_finished'] == 1,
-      imagePath: map['image_path']
+      imagePath: map['image_path'],
+      position: map['position'],
     );
   }
 
@@ -29,7 +32,8 @@ class Task {
       'list_id': listId,
       'name': name,
       'is_finished': isFinished ? 1 : 0,
-      'image_path': imagePath
+      'image_path': imagePath,
+      'position': position,
     };
   }
 }

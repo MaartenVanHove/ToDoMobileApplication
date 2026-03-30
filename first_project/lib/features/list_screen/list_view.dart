@@ -56,7 +56,7 @@ class _ListScreenState extends State<ListScreen> {
                 children: [
                   SizedBox(height: 12),
                   FilterBarList(listId: widget.listId),
-                  ListToolBar(),
+                  if (allTasks.isNotEmpty) ListToolBar(),
 
                   Expanded(
                     child: SingleChildScrollView(

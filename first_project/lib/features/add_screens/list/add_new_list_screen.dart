@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:first_project/core/theme/app_theme_colors.dart';
 import 'package:first_project/widgets/dialogs/input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

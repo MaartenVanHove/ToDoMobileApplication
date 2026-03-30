@@ -39,14 +39,16 @@ class BaseTaskCard extends StatelessWidget {
     required this.textStyle,
   });
 
-void _showImagePreview(BuildContext context) {
+  void _showImagePreview(BuildContext context) {
     // 1. Create local variables to track state changes INSIDE the dialog.
     // This allows the user to see updates without the dialog closing.
     String currentTitle = title;
     String? currentImagePath = imagePath;
-    
+
     // 2. Initialize the controller with the current title.
-    final TextEditingController nameController = TextEditingController(text: title);
+    final TextEditingController nameController = TextEditingController(
+      text: title,
+    );
 
     showDialog(
       context: context,
@@ -55,7 +57,9 @@ void _showImagePreview(BuildContext context) {
           builder: (context, setDialogState) {
             return Dialog(
               backgroundColor: const Color(0xFF162238),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Column(
@@ -79,8 +83,11 @@ void _showImagePreview(BuildContext context) {
                                         height: 200,
                                         width: double.infinity,
                                         color: Colors.black26,
-                                        child: const Icon(Icons.image_not_supported,
-                                            size: 50, color: Colors.white24),
+                                        child: const Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: Colors.white24,
+                                        ),
                                       ),
                                 Positioned(
                                   top: 8,
@@ -88,15 +95,20 @@ void _showImagePreview(BuildContext context) {
                                   child: CircleAvatar(
                                     backgroundColor: Colors.black54,
                                     child: IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.white, size: 20),
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
                                       onPressed: () async {
-                                        File? newImage = await ImageService.pickImage(
-                                            ImageSource.gallery);
+                                        File? newImage =
+                                            await ImageService.pickImage(
+                                              ImageSource.gallery,
+                                            );
                                         if (newImage != null) {
                                           // Update the actual data (Database/Provider)
                                           onImageChanged(newImage.path);
-                                          
+
                                           // Update the local dialog UI
                                           setDialogState(() {
                                             currentImagePath = newImage.path;
@@ -111,7 +123,12 @@ void _showImagePreview(BuildContext context) {
 
                             // --- 📝 IN-LINE EDITABLE TEXT SECTION ---
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                20,
+                                20,
+                                20,
+                              ),
                               child: TextField(
                                 controller: nameController,
                                 style: textStyle.copyWith(
@@ -126,10 +143,14 @@ void _showImagePreview(BuildContext context) {
                                   hintStyle: TextStyle(color: Colors.white24),
                                   border: InputBorder.none,
                                   focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.blueAccent)),
+                                    borderSide: BorderSide(
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
                                 ),
                                 onSubmitted: (newValue) {
-                                  if (newValue.trim().isNotEmpty && newValue != currentTitle) {
+                                  if (newValue.trim().isNotEmpty &&
+                                      newValue != currentTitle) {
                                     onTextChanged(newValue);
                                     setDialogState(() {
                                       currentTitle = newValue;
@@ -159,11 +180,14 @@ void _showImagePreview(BuildContext context) {
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text("Save & Close",
-                              style: TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
+                          child: Text(
+                            "Save & Close",
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -175,10 +199,6 @@ void _showImagePreview(BuildContext context) {
         );
       },
     );
-    // ).then((_) {
-    //   // 3. Clean up the controller only AFTER the dialog is fully closed.
-    //   nameController.dispose();
-    // });
   }
 
   @override
@@ -215,17 +235,13 @@ void _showImagePreview(BuildContext context) {
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
                         color: Colors.black26,
-                        child: Image.file(
-                          File(imagePath!),
-                          fit: BoxFit.cover,
-                        ),
+                        child: Image.file(File(imagePath!), fit: BoxFit.cover),
                       ),
                     ),
                   ),
                 )
               else
                 const SizedBox(width: 12), // Spacer if no image
-
               // TEXT SECTION
               Expanded(
                 child: Padding(
@@ -248,7 +264,11 @@ void _showImagePreview(BuildContext context) {
                   index: index,
                   child: const Padding(
                     padding: EdgeInsets.only(right: 12),
-                    child: Icon(Icons.drag_indicator, color: Colors.white70, size: 26),
+                    child: Icon(
+                      Icons.drag_indicator,
+                      color: Colors.white70,
+                      size: 26,
+                    ),
                   ),
                 ),
 

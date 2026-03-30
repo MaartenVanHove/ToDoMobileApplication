@@ -1,3 +1,4 @@
+import 'package:first_project/features/home_screen/collection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,7 +14,8 @@ class TaskInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     // .watch ensures the widget rebuilds when text or images change
     final listController = context.watch<ListController>();
-    final appState = context.read<AppModel>();
+    final appController = context.read<AppModel>();
+    final collectionController = context.read<CollectionController>();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -117,7 +119,12 @@ class TaskInputField extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               // 3. Add Button
-              _buildAddButton(context, listController, appState),
+              _buildAddButton(
+                context,
+                listController,
+                appController,
+                collectionController,
+              ),
             ],
           ),
         ],
@@ -129,6 +136,7 @@ class TaskInputField extends StatelessWidget {
     BuildContext context,
     ListController controller,
     AppModel appState,
+    CollectionController collectionController,
   ) {
     return Container(
       // Padding ensures it matches the height profile of a single-line input bar
@@ -139,7 +147,8 @@ class TaskInputField extends StatelessWidget {
       ),
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white),
-        onPressed: () => controller.saveTask(appState, listId),
+        onPressed: () =>
+            controller.saveTask(appState, collectionController, listId),
       ),
     );
   }

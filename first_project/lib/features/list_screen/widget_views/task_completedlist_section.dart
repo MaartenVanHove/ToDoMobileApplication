@@ -19,7 +19,7 @@ class TaskCompletedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<AppModel>();
+    final appController = context.read<AppModel>();
 
     return ListView.builder(
       shrinkWrap: true,
@@ -37,7 +37,11 @@ class TaskCompletedListView extends StatelessWidget {
             color: const Color.fromARGB(255, 76, 78, 175),
             child: const Icon(Icons.undo, color: Colors.white),
           ),
-          onDismissed: (_) => appState.toggleTaskFinished(task),
+          onDismissed: (_) => appController.toggleTaskFinished(
+            task,
+            listController.getFinishedTasks(appController, listId).length,
+            listController.getTodoTasks(appController, listId).length,
+          ),
           child: FinishedCard(
             cardName: task.name,
             imagePath: task.imagePath,
@@ -60,19 +64,19 @@ class TaskCompletedListView extends StatelessWidget {
               );
 
               if (newName != null && newName.trim().isNotEmpty) {
-                appState.updateTaskName(task, newName.trim());
+                appController.updateTaskName(task, newName.trim());
                 listController.toggleEditMode(); // Resets UI mode
               }
             },
             onTapInstantDelete: () {
               if (!listController.isEditMode) return;
-              appState.deleteTask(listId, task.id);
+              appController.deleteTask(listId, task.id);
             },
             onImageChanged: (newPath) {
-              appState.updateTaskImage(task, newPath);
+              appController.updateTaskImage(task, newPath);
             },
             onTextChanged: (newText) {
-              appState.updateTaskName(task, newText);
+              appController.updateTaskName(task, newText);
             },
           ),
         );

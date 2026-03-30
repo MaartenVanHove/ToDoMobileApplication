@@ -3,7 +3,6 @@ import 'package:first_project/features/list_screen/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:first_project/model/app_model.dart';
-import 'package:first_project/features/home_screen/collection_controller.dart';
 
 class FilterBarList extends StatelessWidget {
   final int listId;
@@ -12,7 +11,6 @@ class FilterBarList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final collectionController = context.watch<CollectionController>();
     final listController = context.read<ListController>();
     final appState = context.watch<AppModel>();
     final list = appState.getListById(listId);
@@ -29,17 +27,13 @@ class FilterBarList extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               if (index == 0) {
-                final isAllSelected =
-                    collectionController.selectedTagIds.isEmpty;
                 return ActionChip(
                   label: const Text("Tag"),
                   avatar: const Icon(Icons.add, color: Colors.white, size: 18),
                   onPressed: () =>
-                      listController.AddNewTag(context, appState, listId),
+                      listController.addNewTag(context, appState, listId),
                   backgroundColor: AppThemeColors.accent,
-                  labelStyle: TextStyle(
-                    color: isAllSelected ? Colors.white : Colors.white54,
-                  ),
+                  labelStyle: TextStyle(color: Colors.white),
                 );
               }
 

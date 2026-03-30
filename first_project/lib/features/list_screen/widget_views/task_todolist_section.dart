@@ -15,7 +15,7 @@ class TaskListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final listController = context.watch<ListController>();
-    final appState = context.read<AppModel>();
+    final appController = context.read<AppModel>();
 
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
@@ -23,11 +23,18 @@ class TaskListView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: tasks.length,
       onReorder: (oldIndex, newIndex) {
-        // Logic moved to appState or handled locally if list is passed by ref
         if (oldIndex < newIndex) newIndex -= 1;
-        final movedTask = tasks.removeAt(oldIndex);
-        tasks.insert(newIndex, movedTask);
-        appState.updateTaskOrder(listId, tasks);
+
+        final List<Task> items = List.from(tasks);
+        print("Old list: ${items.map((t) => t.name).toList()}");
+        print("Old pos: ${items.map((t) => t.position).toList()}");
+        final movedTask = items.removeAt(oldIndex);
+        items.insert(newIndex, movedTask);
+        print("New list ${items.map((t) => t.name).toList()}");
+        print("New pos ${items.map((t) => t.position).toList()}");
+
+        // Tell the controller to update the state and the DB
+        appController.updateTaskOrder(listId, items);
       },
       itemBuilder: (context, index) {
         final task = tasks[index];
@@ -43,7 +50,11 @@ class TaskListView extends StatelessWidget {
             color: const Color.fromARGB(255, 60, 244, 54),
             child: const Icon(Icons.check, color: Colors.white),
           ),
-          onDismissed: (_) => appState.toggleTaskFinished(task),
+          onDismissed: (_) => appController.toggleTaskFinished(
+            task,
+            listController.getFinishedTasks(appController, listId).length,
+            listController.getTodoTasks(appController, listId).length,
+          ),
           child: TodoCard(
             cardName: task.name,
             imagePath: task.imagePath,
@@ -62,17 +73,18 @@ class TaskListView extends StatelessWidget {
                     InputDialog(title: "Change '${task.name}' name"),
               );
               if (newName != null && newName.trim().isNotEmpty) {
-                appState.updateTaskName(task, newName.trim());
+                appController.updateTaskName(task, newName.trim());
                 listController
                     .toggleEditMode(); // Closes edit mode after change
               }
             },
 
-            onTapInstantDelete: () => appState.deleteTask(listId, task.id),
+            onTapInstantDelete: () => appController.deleteTask(listId, task.id),
 
             onImageChanged: (newPath) =>
-                appState.updateTaskImage(task, newPath),
-            onTextChanged: (newText) => appState.updateTaskName(task, newText),
+                appController.updateTaskImage(task, newPath),
+            onTextChanged: (newText) =>
+                appController.updateTaskName(task, newText),
           ),
         );
       },
