@@ -1,5 +1,5 @@
 import 'package:first_project/features/home_screen/collection_view.dart';
-import 'package:first_project/features/home_screen/collection_controller.dart'; // Add this import
+import 'package:first_project/features/home_screen/collection_controller.dart';
 import 'package:first_project/model/app_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // USE MULTIPROVIDER TO INJECT BOTH CONTROLLERS
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppModel()),

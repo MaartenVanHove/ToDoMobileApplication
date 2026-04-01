@@ -26,14 +26,9 @@ class TaskListView extends StatelessWidget {
         if (oldIndex < newIndex) newIndex -= 1;
 
         final List<Task> items = List.from(tasks);
-        print("Old list: ${items.map((t) => t.name).toList()}");
-        print("Old pos: ${items.map((t) => t.position).toList()}");
         final movedTask = items.removeAt(oldIndex);
         items.insert(newIndex, movedTask);
-        print("New list ${items.map((t) => t.name).toList()}");
-        print("New pos ${items.map((t) => t.position).toList()}");
 
-        // Tell the controller to update the state and the DB
         appController.updateTaskOrder(listId, items);
       },
       itemBuilder: (context, index) {

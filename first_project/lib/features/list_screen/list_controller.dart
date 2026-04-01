@@ -95,6 +95,7 @@ class ListController extends ChangeNotifier {
     } else {
       selectedTaskIds.add(taskId);
     }
+
     notifyListeners(); // This is the new "setState"
   }
 

@@ -363,10 +363,10 @@ class DatabaseServices {
     final db = await database;
     return await db.rawQuery(
       '''
-      SELECT tags.* FROM tags
-      INNER JOIN list_tags ON tags.id = list_tags.tag_id
-      WHERE list_tags.list_id = ?
-    ''',
+        SELECT tags.* FROM tags
+        INNER JOIN list_tags ON tags.id = list_tags.tag_id
+        WHERE list_tags.list_id = ?
+      ''',
       [listId],
     );
   }
@@ -375,10 +375,10 @@ class DatabaseServices {
     final db = await database;
     return await db.rawQuery(
       '''
-      SELECT todo_lists.* FROM todo_lists
-      INNER JOIN list_tags ON todo_lists.id = list_tags.list_id
-      WHERE list_tags.tag_id = ?
-    ''',
+        SELECT todo_lists.* FROM todo_lists
+        INNER JOIN list_tags ON todo_lists.id = list_tags.list_id
+        WHERE list_tags.tag_id = ?
+      ''',
       [tagId],
     );
   }
